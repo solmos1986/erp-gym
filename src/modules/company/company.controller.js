@@ -46,6 +46,14 @@ export const registerCompany = async (req, res) => {
           companyId: company.id
         }
       });
+      const ownerRole = await tx.role.findFirst({
+        where: {
+          name: "OWNER",
+          scope: "TENANT",
+          companyId: company.id
+        }
+      });
+      
       // 👤 crear owner
       const user = await tx.user.create({
         data: {
