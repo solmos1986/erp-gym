@@ -47,7 +47,11 @@ export const registerCompany = async (req, res) => {
           email,
           password: hashedPassword,
           role: "OWNER",
-          companyId: company.id
+          company: {
+      connect: {
+        id: company.id
+      }
+    }
         }
       });
 
