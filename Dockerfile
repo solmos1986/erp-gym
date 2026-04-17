@@ -7,6 +7,9 @@ RUN npm install
 
 COPY . .
 
+# 🔥 CLAVE
+RUN npx prisma generate
+
 EXPOSE 3000
 
 CMD ["node", "src/server.js"]
