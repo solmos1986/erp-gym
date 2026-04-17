@@ -90,7 +90,7 @@ export const login = async (req, res) => {
     });
 
   } catch (error) {
-    
+    console.error('LOGIN ERROR:', error); // 🔥 AGREGAR ESTO
     res.status(500).json({ message: "Login error" });
   }
 };
