@@ -54,12 +54,13 @@ export const registerCompany = async (req, res) => {
           password: hashedPassword,
           role: "OWNER",
           company: {
-      connect: {
-        id: company.id
-      },branch: {
-      connect: { id: branch.id }
-    }
-    }
+            connect: {
+              id: company.id
+            }
+          },
+          branch: {
+            connect: { id: branch.id }
+          }
         }
       });
 
