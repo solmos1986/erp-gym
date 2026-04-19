@@ -25,7 +25,12 @@ startMembershipExpirationJob();
 // =============================
 // 🔥 MIDDLEWARES GLOBALES
 // =============================
-app.use(cors());
+// Configura CORS para permitir tu frontend
+app.use(cors({
+  origin: 'https://gymcloud.apus-security.com',  // Reemplaza con el dominio de tu frontend
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true,
+}));
 app.use(express.json());
 
 // 🔥🔥🔥 IMPORTANTE (SERVIR IMÁGENES)
