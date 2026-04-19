@@ -2,6 +2,7 @@ version: '3'
 
 services:
   backend:
+    container_name: erp_backend
     image: erp_backend
     build: .
     ports:
@@ -14,6 +15,7 @@ services:
       - backend-network
 
   postgres:
+    container_name: erp_postgres
     image: postgres:15
     ports:
       - "5432:5432"
