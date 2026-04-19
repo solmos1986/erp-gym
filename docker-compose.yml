@@ -2,7 +2,7 @@ version: '3'
 
 services:
   backend:
-    image: your-backend-image
+    image: erp_backend
     build: .
     ports:
       - "3000:3000"
