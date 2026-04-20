@@ -25,7 +25,11 @@ startMembershipExpirationJob();
 // =============================
 // 🔥 MIDDLEWARES GLOBALES
 // =============================
-app.use(cors());
+app.use(cors({
+  origin: 'http://144.126.150.74:3000', // Reemplaza esto con el dominio de tu frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // Si estás utilizando cookies o sesiones
+}));
 app.use(express.json());
 
 // 🔥🔥🔥 IMPORTANTE (SERVIR IMÁGENES)
