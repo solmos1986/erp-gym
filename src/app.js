@@ -21,18 +21,13 @@ import { WebSocketServer } from 'ws';
 import { sendCommandToAgent } from './lib/websocket.server.js';
 
 const app = express();
-
+startMembershipExpirationJob();
 // =============================
 // 🔥 MIDDLEWARES GLOBALES
 // =============================
-const cors = require('cors');
-app.use(cors({
-    origin: 'https://gymcloud.aplus-security.com', // Asegúrate de que esta sea la URL de tu frontend
-    methods: ['GET', 'POST'],
-    credentials: true,
-}));
+app.use(cors());
 app.use(express.json());
-startMembershipExpirationJob();
+
 // 🔥🔥🔥 IMPORTANTE (SERVIR IMÁGENES)
 app.use('/uploads', express.static('uploads'));
 

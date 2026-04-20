@@ -13,8 +13,8 @@ RUN npm install
 COPY . .
 
 # Ejecutar las migraciones y el seed
-RUN npx prisma migrate deploy --schema=prisma/schema.prisma  # Aplica las migraciones
-RUN npx prisma db seed --schema=prisma/schema.prisma        # Ejecuta el seed
+#RUN npx prisma migrate dev --name init  # Aplica las migraciones
+#RUN npx prisma db seed --schema=prisma/schema.prisma        # Ejecuta el seed
 
 # Generar el cliente Prisma
 RUN npx prisma generate
