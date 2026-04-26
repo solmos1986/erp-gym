@@ -121,7 +121,7 @@ export const getDevices = async (req, res) => {
       const diff = d.lastSeenAt ? now - new Date(d.lastSeenAt) : Infinity;
       const isAlive = diff < HEARTBEAT_TIMEOUT;
 
-      let status = "OFFLINEs";
+      let status = "OFFLINE";
 
       if (isAlive) {
         status = "ONLINE";
