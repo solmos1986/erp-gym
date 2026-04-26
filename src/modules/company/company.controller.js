@@ -1,6 +1,6 @@
 import prisma from "../../lib/prisma.js";
 import bcrypt from "bcrypt";
-
+import crypto from "crypto";
 // =========================
 // ➕ CREAR COMPANY
 // =========================
