@@ -129,7 +129,9 @@ export const purchase = async ({
     });
 
     // 🚀 notificar agent
-    sendCommandToAgent(companyId, branchId, 'SYNC');
+    sendCommandToAgent(companyId, branchId, {
+  type: 'SYNC'
+});
 
     return { sale, membership };
   });
