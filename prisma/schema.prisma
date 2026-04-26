@@ -204,22 +204,22 @@ model Branch {
 // CLIENTES-PROVEEDORES
 //////////////
 model Partner {
-  id        String  @id @db.Text
-  companyId String  @db.Text
+  id        String  @id @default(uuid())
+  companyId String
 
   type      PartnerType
 
-  name      String  @db.Text
-  document  String? @db.Text
-  phone     String? @db.Text
-  email     String? @db.Text
-  address   String? @db.Text
+  name      String
+  document  String?
+  phone     String?
+  email     String?
+  address   String?
   
   isActive  Boolean @default(true)
 
-  createdAt DateTime @db.Timestamp(6)
+  createdAt DateTime @default(now())
   imageUrl  String?
-  // 🔥 relaciones
+
   company Company @relation(fields: [companyId], references: [id])
 
   memberships      CustomerMembership[]
