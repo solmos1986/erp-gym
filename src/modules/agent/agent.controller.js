@@ -75,6 +75,7 @@ export const agentHeartbeat = async (req, res) => {
         await prisma.device.update({
           where: { id: d.deviceId },
           data: {
+            lastSeenAt: new Date(),
             status: d.status,
             lastConnectionAt: new Date()
           }
