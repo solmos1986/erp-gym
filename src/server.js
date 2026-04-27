@@ -1,21 +1,15 @@
-// import app from "./app.js";
-
-// const PORT = 3000;
-
-// app.listen(PORT, '0.0.0.0',() => {
-//   console.log('Backend está corriendo en http://0.0.0.0:3000');
-// });
-import { createServer } from "http";
-import { WebSocketServer } from "ws";
+import http from "http";
 import app from "./app.js";
+import { initWebSocket } from "./lib/websocket.server.js";
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Crear servidor HTTP
-const server = createServer(app);
+// 🔥 crear server real
+const server = http.createServer(app);
 
+// 🔥 conectar WebSocket
+initWebSocket(server);
 
-// Levantar TODO junto
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Backend + WS corriendo en ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 Server corriendo en puerto ${PORT}`);
 });

@@ -128,9 +128,11 @@ export const purchase = async ({
       }
     });
 
-    // 🚀 notificar agent
-    sendCommandToAgent(companyId, branchId, {
-  type: 'SYNC'
+    // 🔥 NOTIFICAR AL AGENT
+sendCommandToAgent({
+  companyId: command.companyId,
+  branchId: command.branchId,
+  payload: command
 });
 
     return { sale, membership };
