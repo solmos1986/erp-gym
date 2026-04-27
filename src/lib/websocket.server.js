@@ -48,8 +48,7 @@ export function sendCommandToAgent({ companyId, branchId, payload }) {
     ) {
       client.ws.send(
         JSON.stringify({
-          type: "NEW_COMMAND",
-          data: payload,
+          type: "SYNC"
         })
       );
     }
