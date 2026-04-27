@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { sendCommandToAgent } from '../../lib/websocket.server.js';
+import { sendCommandToAgent, notifyFrontend } from '../../lib/websocket.server.js';
 const prisma = new PrismaClient();
 
 // helper
