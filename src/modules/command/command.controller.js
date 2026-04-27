@@ -78,7 +78,9 @@ export async function completeCommand(req, res) {
       where: { id },
       data
     });
-
+    notifyFrontend({
+      type: "MEMBERSHIP_UPDATE"
+    });
     return res.json({ ok: true });
 
   } catch (err) {

@@ -130,6 +130,9 @@ export const purchase = async ({
 sendCommandToAgent(companyId, branchId, {
   type: 'SYNC'
 });
+notifyFrontend({
+  type: "MEMBERSHIP_UPDATE"
+});
     // 🔥 NOTIFICAR AL AGENT
 //sendCommandToAgent({
   //companyId: command.companyId,
