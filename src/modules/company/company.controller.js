@@ -173,7 +173,7 @@ export const getCompanies = async (req, res) => {
         companyPermissions: true,
         branches: {
           include: {
-            agent: true // 🔥 opcional pero recomendado
+            agents: true // 🔥 opcional pero recomendado
           }
         }
       }
