@@ -95,53 +95,67 @@ export const agentHeartbeat = async (req, res) => {
 //========================
 // AGENT DOWNLOAD
 //=============================
+import archiver from "archiver";
+import fs from "fs";
+import { prisma } from "../../config/prisma.js";
+
 export async function downloadAgent(req, res) {
   try {
     const { companyId, branchId } = req.params;
 
-    // 🔐 Validar que el usuario solo descargue su empresa
+    // 🔐 Validar usuario
     if (req.user.companyId !== companyId) {
       return res.status(403).json({
         message: "No autorizado"
       });
     }
 
-    // 📦 Ruta dentro del contenedor Docker
-    const agentPath = "/app/uploads/agent/agent.exe";
+    // 🔥 BUSCAR EL AGENT REAL
+    const agent = await prisma.agent.findFirst({
+      where: {
+        companyId,
+        branchId,
+        isActive: true
+      }
+    });
 
-    // 🔍 Verificar que existe
-    if (!fs.existsSync(agentPath)) {
+    if (!agent) {
       return res.status(404).json({
-        message: "Agent no encontrado en el servidor"
+        message: "Agent no encontrado"
       });
     }
 
-    // 🔥 Config dinámica
+    // 📦 Ruta del exe (Docker)
+    const agentPath = "/app/uploads/agent/agent.exe";
+
+    if (!fs.existsSync(agentPath)) {
+      return res.status(404).json({
+        message: "Agent.exe no encontrado"
+      });
+    }
+
+    // 🔥 CONFIG REAL
     const config = {
       WEBSOCKET_URL: "wss://apigymcloud.aplus-security.com/ws/",
-      AGENT_KEY: `AGENT_${companyId}`, // puedes mejorar luego
+      AGENT_KEY: agent.agentKey, // ✅ CLAVE
       COMPANY_ID: companyId,
       BRANCH_ID: branchId
     };
 
-    // 📦 Headers para descarga
     res.setHeader("Content-Type", "application/zip");
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=agent-${companyId}.zip`
     );
 
-    // 🧩 Crear ZIP
     const archive = archiver("zip", {
-      zlib: { level: 9 }
+      zlib: { level: 0 } // 🔥 rápido
     });
 
     archive.pipe(res);
 
-    // 👉 agregar el .exe
     archive.file(agentPath, { name: "agent.exe" });
 
-    // 👉 agregar config dinámica
     archive.append(JSON.stringify(config, null, 2), {
       name: "config.local.json"
     });
