@@ -193,7 +193,7 @@ model Branch {
 
   createdAt DateTime @default(now())
   devices Device[]
-  agents Agent[]
+  agents Agent[] @relation("BranchAgents")
   commands Command[]
   membershipSales MembershipSale[]
   memberships      CustomerMembership[]
@@ -370,7 +370,7 @@ model Agent {
   updatedAt DateTime @updatedAt @default(now())
 
   company Company @relation(fields: [companyId], references: [id])
-  branch  Branch  @relation(fields: [branchId], references: [id])
+  branch  Branch @relation("BranchAgents", fields: [branchId], references: [id])
 
   devices Device[]
 
