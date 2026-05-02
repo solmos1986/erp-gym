@@ -33,5 +33,5 @@ router.get(
   requireAuth, // 🔥 PROTECCIÓN
   downloadAgent
 );
-router.get("/agent/download-exe", downloadAgentExe);
+router.get("/download-exe", downloadAgentExe);
 export default router;
