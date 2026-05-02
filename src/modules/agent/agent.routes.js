@@ -5,7 +5,8 @@ import {
   agentLogin,
   getAgentConfig,
   agentHeartbeat,
-  downloadAgent
+  downloadAgent,
+  downloadAgentExe
 } from "./agent.controller.js";
 
 import {
@@ -32,4 +33,5 @@ router.get(
   requireAuth, // 🔥 PROTECCIÓN
   downloadAgent
 );
+router.get("/agent/download-exe", downloadAgentExe);
 export default router;

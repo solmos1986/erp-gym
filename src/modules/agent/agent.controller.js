@@ -95,82 +95,12 @@ export const agentHeartbeat = async (req, res) => {
 //========================
 // AGENT DOWNLOAD
 //=============================
-// export async function downloadAgent(req, res) {
-//   try {
-//     const { companyId, branchId } = req.params;
 
-//     🔐 Validar usuario
-//     if (req.user.companyId !== companyId) {
-//       return res.status(403).json({
-//         message: "No autorizado"
-//       });
-//     }
-
-//     🔥 BUSCAR EL AGENT REAL
-//     const agent = await prisma.agent.findFirst({
-//       where: {
-//         companyId,
-//         branchId,
-//         isActive: true
-//       }
-//     });
-
-//     if (!agent) {
-//       return res.status(404).json({
-//         message: "Agent no encontrado"
-//       });
-//     }
-
-//     📦 Ruta del exe (Docker)
-//     const agentPath = "/app/uploads/agent/agent.exe";
-
-//     if (!fs.existsSync(agentPath)) {
-//       return res.status(404).json({
-//         message: "Agent.exe no encontrado"
-//       });
-//     }
-
-//     🔥 CONFIG REAL
-//     const config = {
-//       WEBSOCKET_URL: "wss://apigymcloud.aplus-security.com/ws/",
-//       AGENT_KEY: agent.agentKey, // ✅ CLAVE
-//       COMPANY_ID: companyId,
-//       BRANCH_ID: branchId
-//     };
-
-//     res.setHeader("Content-Type", "application/zip");
-//     res.setHeader(
-//       "Content-Disposition",
-//       `attachment; filename=agent-${companyId}.zip`
-//     );
-
-//     const archive = archiver("zip", {
-//       zlib: { level: 0 } // 🔥 rápido
-//     });
-
-//     archive.pipe(res);
-
-//     archive.file(agentPath, { name: "agent.exe" });
-
-//     archive.append(JSON.stringify(config, null, 2), {
-//       name: "config.local.json"
-//     });
-
-//     await archive.finalize();
-
-//   } catch (error) {
-//     console.error("❌ Error descargando agent:", error);
-
-//     res.status(500).json({
-//       message: "Error generando el agent"
-//     });
-//   }
-// }
 export async function downloadAgent(req, res) {
   try {
     const { branchId } = req.params;
 
-    // 🔎 1. Buscar la sucursal real
+    // 🔎 1. Buscar sucursal
     const branch = await prisma.branch.findUnique({
       where: { id: branchId }
     });
@@ -192,7 +122,7 @@ export async function downloadAgent(req, res) {
       }
     }
 
-    // 🔥 3. Buscar el agent REAL
+    // 🔥 3. Buscar agent
     const agent = await prisma.agent.findFirst({
       where: {
         branchId: branch.id,
@@ -206,7 +136,34 @@ export async function downloadAgent(req, res) {
       });
     }
 
-    // 📦 Ruta del exe
+    // 🔥 4. Configuración
+    const config = {
+      WEBSOCKET_URL: "wss://apigymcloud.aplus-security.com/ws/",
+      AGENT_KEY: agent.agentKey,
+      COMPANY_ID: branch.companyId,
+      BRANCH_ID: branch.id
+    };
+
+    // 📄 Enviar como archivo descargable
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=config.local.json"
+    );
+
+    res.send(JSON.stringify(config, null, 2));
+
+  } catch (error) {
+    console.error("❌ Error generando config:", error);
+
+    res.status(500).json({
+      message: "Error generando config"
+    });
+  }
+}
+
+export async function downloadAgentExe(req, res) {
+  try {
     const agentPath = "/app/uploads/agent/agent.exe";
 
     if (!fs.existsSync(agentPath)) {
@@ -215,39 +172,11 @@ export async function downloadAgent(req, res) {
       });
     }
 
-    // 🔥 4. Configuración real
-    const config = {
-      WEBSOCKET_URL: "wss://apigymcloud.aplus-security.com/ws/",
-      AGENT_KEY: agent.agentKey,
-      COMPANY_ID: branch.companyId, // 🔥 desde DB
-      BRANCH_ID: branch.id
-    };
-
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=agent-${branch.companyId}.zip`
-    );
-
-    const archive = archiver("zip", {
-      zlib: { level: 0 }
-    });
-
-    archive.pipe(res);
-
-    archive.file(agentPath, { name: "agent.exe" });
-
-    archive.append(JSON.stringify(config, null, 2), {
-      name: "config.local.json"
-    });
-
-    await archive.finalize();
+    res.download(agentPath, "agent.exe");
 
   } catch (error) {
-    console.error("❌ Error descargando agent:", error);
-
     res.status(500).json({
-      message: "Error generando el agent"
+      message: "Error descargando agent"
     });
   }
 }
