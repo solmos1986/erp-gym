@@ -164,7 +164,7 @@ export async function downloadAgent(req, res) {
 
 export async function downloadAgentExe(req, res) {
   try {
-    const agentPath = "/app/uploads/agent/agent.exe";
+    const agentPath = "/app/uploads/agent/agent.zip";
 
     if (!fs.existsSync(agentPath)) {
       return res.status(404).json({
