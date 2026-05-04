@@ -117,11 +117,11 @@ export const createBranch = async (req, res) => {
     }
 
     // 🔐 SOLO SYSTEM (staff)
-    if (!req.user?.isSystem) {
-      return res.status(403).json({
-        message: "No autorizado",
-      });
-    }
+    if (!req.user?.systemRoles?.includes("SYSTEM_ADMIN")) {
+  return res.status(403).json({
+    message: "No tienes permiso para esta acción"
+  });
+}
 
     // =========================
     // VALIDAR EMPRESA
