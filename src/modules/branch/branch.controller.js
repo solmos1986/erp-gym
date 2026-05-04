@@ -39,18 +39,108 @@ export const getBranches = async (req, res) => {
 // =========================
 // ➕ CREAR SUCURSAL + AGENT
 // =========================
+// export const createBranch = async (req, res) => {
+//   try {
+//     const { name } = req.body;
+//     const companyId = req.user.companyId; // 🔥 clave multi-tenant
+
+//     if (!name) {
+//       return res.status(400).json({
+//         message: "Nombre requerido",
+//       });
+//     }
+
+//     const result = await prisma.$transaction(async (tx) => {
+//       // 1️⃣ Crear sucursal
+//       const branch = await tx.branch.create({
+//         data: {
+//           name,
+//           companyId,
+//         },
+//       });
+
+//       // 2️⃣ Generar agentKey seguro
+//       const agentKey = crypto.randomBytes(32).toString("hex");
+
+//       // 3️⃣ Crear Agent automático
+//       const agent = await tx.agent.create({
+//         data: {
+//           name: `Agent - ${branch.name}`, // 🔥 EXTRA PRO
+//           agentKey,
+//           companyId,
+//           branchId: branch.id,
+//         },
+//       });
+
+//       return { branch, agentKey };
+//     });
+
+//     return res.status(201).json({
+//       message: "Sucursal creada correctamente",
+//       branch: result.branch,
+
+//       // 🔐 IMPORTANTE: solo mostrar una vez
+//       agentKey: result.agentKey,
+//     });
+//   } catch (error) {
+    
+
+//     // 🔥 error por duplicado (name + companyId)
+//     if (error.code === "P2002") {
+//       return res.status(400).json({
+//         message: "Ya existe una sucursal con ese nombre",
+//       });
+//     }
+
+//     return res.status(500).json({
+//       message: "Error al crear sucursal",
+//     });
+//   }
+// };
 export const createBranch = async (req, res) => {
   try {
-    const { name } = req.body;
-    const companyId = req.user.companyId; // 🔥 clave multi-tenant
+    const { name, companyId } = req.body;
 
+    // =========================
+    // VALIDACIONES
+    // =========================
     if (!name) {
       return res.status(400).json({
         message: "Nombre requerido",
       });
     }
 
+    if (!companyId) {
+      return res.status(400).json({
+        message: "Empresa requerida",
+      });
+    }
+
+    // 🔐 SOLO SYSTEM (staff)
+    if (!req.user?.isSystem) {
+      return res.status(403).json({
+        message: "No autorizado",
+      });
+    }
+
+    // =========================
+    // VALIDAR EMPRESA
+    // =========================
+    const company = await prisma.company.findUnique({
+      where: { id: companyId }
+    });
+
+    if (!company) {
+      return res.status(404).json({
+        message: "Empresa no encontrada"
+      });
+    }
+
+    // =========================
+    // TRANSACTION
+    // =========================
     const result = await prisma.$transaction(async (tx) => {
+
       // 1️⃣ Crear sucursal
       const branch = await tx.branch.create({
         data: {
@@ -59,13 +149,13 @@ export const createBranch = async (req, res) => {
         },
       });
 
-      // 2️⃣ Generar agentKey seguro
+      // 2️⃣ Generar agentKey
       const agentKey = crypto.randomBytes(32).toString("hex");
 
       // 3️⃣ Crear Agent automático
-      const agent = await tx.agent.create({
+      await tx.agent.create({
         data: {
-          name: `Agent - ${branch.name}`, // 🔥 EXTRA PRO
+          name: `Agent - ${branch.name}`,
           agentKey,
           companyId,
           branchId: branch.id,
@@ -78,14 +168,12 @@ export const createBranch = async (req, res) => {
     return res.status(201).json({
       message: "Sucursal creada correctamente",
       branch: result.branch,
-
-      // 🔐 IMPORTANTE: solo mostrar una vez
-      agentKey: result.agentKey,
+      agentKey: result.agentKey, // 👈 solo mostrar una vez
     });
-  } catch (error) {
-    
 
-    // 🔥 error por duplicado (name + companyId)
+  } catch (error) {
+    console.error("❌ ERROR CREATE BRANCH:", error);
+
     if (error.code === "P2002") {
       return res.status(400).json({
         message: "Ya existe una sucursal con ese nombre",
