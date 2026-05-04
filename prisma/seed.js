@@ -334,7 +334,7 @@ const systemBranch = await prisma.branch.upsert({
   // 👤 USER SYSTEM ADMIN
   // =========================
   const adminEmail = 'admin@erp.com';
-  const passwordHash = await bcrypt.hash('123456', 10);
+  const passwordHash = await bcrypt.hash('4plus.654', 10);
 
   const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
