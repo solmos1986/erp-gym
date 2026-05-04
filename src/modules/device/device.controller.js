@@ -9,6 +9,9 @@ const SECRET = process.env.DEVICE_SECRET || "secret_dev";
 const encrypt = (text) => {
   return CryptoJS.AES.encrypt(text, SECRET).toString();
 };
+function isEncrypted(text) {
+  return typeof text === "string" && text.startsWith("U2FsdGVkX1");
+}
 
 //////////////////////////////////////
 // 🧠 VALIDACIÓN
@@ -189,17 +192,14 @@ export const updateDevice = async (req, res) => {
     const { id } = req.params;
 
     const deviceExists = await prisma.device.findFirst({
-      where: {
-        id,
-        companyId
-      }
+      where: { id, companyId }
     });
 
     if (!deviceExists) {
       return res.status(404).json({ message: "Device no encontrado" });
     }
 
-    const {
+    let {
       name,
       ip,
       port,
@@ -213,15 +213,22 @@ export const updateDevice = async (req, res) => {
     // 🔒 validar sucursal si viene
     if (branchId) {
       const branch = await prisma.branch.findFirst({
-        where: {
-          id: branchId,
-          companyId
-        }
+        where: { id: branchId, companyId }
       });
 
       if (!branch) {
         return res.status(404).json({ message: "Sucursal no válida" });
       }
+    }
+
+    // 🔐 MANEJO CORRECTO DE PASSWORD
+    if (password && password.trim() !== "") {
+      if (!isEncrypted(password)) {
+        password = encrypt(password);
+      }
+    } else {
+      // 🔥 si viene vacío → NO actualizar password
+      password = undefined;
     }
 
     const updated = await prisma.device.update({
@@ -231,7 +238,7 @@ export const updateDevice = async (req, res) => {
         ...(ip && { ip }),
         ...(port !== undefined && { port }),
         ...(username && { username }),
-        ...(password && { password: encrypt(password) }),
+        ...(password !== undefined && { password }),
         ...(deviceType && { deviceType }),
         ...(brand && { brand }),
         ...(branchId && { branchId })
@@ -239,8 +246,8 @@ export const updateDevice = async (req, res) => {
     });
 
     res.json(updated);
+
   } catch (error) {
-    
 
     if (error.code === "P2002") {
       return res.status(400).json({
