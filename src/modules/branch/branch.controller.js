@@ -117,9 +117,9 @@ export const createBranch = async (req, res) => {
     }
 
     // 🔐 SOLO SYSTEM (staff)
-    if (!req.user?.systemRoles?.includes("SYSTEM_ADMIN")) {
+ if (!req.user?.permissions?.includes("SYSTEM_BRANCH_CREATE")) {
   return res.status(403).json({
-    message: "No tienes permiso para esta acción"
+    message: "No tienes permiso para crear sucursales"
   });
 }
 
