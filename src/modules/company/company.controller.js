@@ -4,6 +4,164 @@ import crypto from "crypto";
 // =========================
 // ➕ CREAR COMPANY
 // =========================
+// export const registerCompany = async (req, res) => {
+//   const { name, fullName, email, password, permissions, logoUrl } = req.body;
+
+//   try {
+//     const result = await prisma.$transaction(async (tx) => {
+
+//       // ========================
+//       // VALIDACIONES
+//       // ========================
+//       if (!name) throw new Error("Nombre de empresa requerido");
+//       if (!fullName) throw new Error("Nombre completo requerido");
+//       if (!email) throw new Error("Email requerido");
+//       if (!password) throw new Error("Password requerido");
+
+//       const parsedPermissions = permissions || [];
+
+//       if (!parsedPermissions.length) {
+//         throw new Error("Debe seleccionar permisos");
+//       }
+
+//       // ========================
+//       // VALIDAR EMAIL ÚNICO
+//       // ========================
+//       const existingUser = await tx.user.findUnique({
+//         where: { email }
+//       });
+
+//       if (existingUser) {
+//         throw new Error("El email ya está registrado");
+//       }
+
+//       // ========================
+//       // VALIDAR PERMISOS
+//       // ========================
+//       const validPermissions = await tx.permission.findMany({
+//         where: {
+//           id: { in: parsedPermissions },
+//           scope: "TENANT"
+//         }
+//       });
+
+//       if (validPermissions.length !== parsedPermissions.length) {
+//         throw new Error("Permisos inválidos detectados");
+//       }
+
+//       // ========================
+//       // CREAR EMPRESA
+//       // ========================
+//       const company = await tx.company.create({
+//         data: {
+//           name,
+//           logoUrl,
+//           isActive: true
+//         }
+//       });
+
+//       // ========================
+//       // CREAR BRANCH
+//       // ========================
+//       const branch = await tx.branch.create({
+//         data: {
+//           name: "Principal",
+//           companyId: company.id
+//         }
+//       });
+//       // 2️⃣ Generar agentKey seguro
+//             const agentKey = crypto.randomBytes(32).toString("hex");
+      
+//             // 3️⃣ Crear Agent automático
+//             const agent = await tx.agent.create({
+//               data: {
+//                 name: `Agent - ${branch.name}`, // 🔥 EXTRA PRO
+//                 agentKey,
+//                 companyId: company.id,
+//                 branchId: branch.id,
+//               },
+//             });
+
+//       // ========================
+//       // CREAR ROLE OWNER
+//       // ========================
+//       const ownerRole = await tx.role.create({
+//         data: {
+//           name: "OWNER",
+//           scope: "TENANT",
+//           companyId: company.id
+//         }
+//       });
+
+//       // ========================
+//       // ASIGNAR PERMISOS AL ROLE
+//       // ========================
+//       await tx.rolePermission.createMany({
+//         data: parsedPermissions.map((permissionId) => ({
+//           roleId: ownerRole.id,
+//           permissionId
+//         })),
+//         skipDuplicates: true // 🔥 IMPORTANTE
+//       });
+
+//       // ========================
+//       // HASH PASSWORD
+//       // ========================
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       // ========================
+//       // CREAR USUARIO
+//       // ========================
+//       const user = await tx.user.create({
+//         data: {
+//           fullName,
+//           email,
+//           password: hashedPassword,
+//           companyId: company.id,
+//           branchId: branch.id
+//         }
+//       });
+
+//       // ========================
+//       // ASIGNAR ROLE AL USER
+//       // ========================
+//       await tx.userRole.create({
+//         data: {
+//           userId: user.id,
+//           roleId: ownerRole.id,
+//           companyId: company.id
+//         }
+//       });
+
+//       // ========================
+//       // PERMISOS DE EMPRESA
+//       // ========================
+//       await tx.companyPermission.createMany({
+//         data: parsedPermissions.map((permissionId) => ({
+//           companyId: company.id,
+//           permissionId
+//         })),
+//         skipDuplicates: true // 🔥 IMPORTANTE
+//       });
+
+//       return {
+//         company,
+//         user
+//       };
+//     });
+
+//     res.status(201).json({
+//       message: "Empresa creada correctamente",
+//       data: result
+//     });
+
+//   } catch (error) {
+//     console.error("❌ ERROR REGISTER COMPANY:", error); // 🔥 LOG REAL
+//     res.status(400).json({
+//       message: error.message || "Error creando empresa"
+//     });
+//   }
+// };
 export const registerCompany = async (req, res) => {
   const { name, fullName, email, password, permissions, logoUrl } = req.body;
 
@@ -25,7 +183,7 @@ export const registerCompany = async (req, res) => {
       }
 
       // ========================
-      // VALIDAR EMAIL ÚNICO
+      // EMAIL ÚNICO
       // ========================
       const existingUser = await tx.user.findUnique({
         where: { email }
@@ -61,7 +219,7 @@ export const registerCompany = async (req, res) => {
       });
 
       // ========================
-      // CREAR BRANCH
+      // CREAR BRANCH PRINCIPAL
       // ========================
       const branch = await tx.branch.create({
         data: {
@@ -69,18 +227,20 @@ export const registerCompany = async (req, res) => {
           companyId: company.id
         }
       });
-      // 2️⃣ Generar agentKey seguro
-            const agentKey = crypto.randomBytes(32).toString("hex");
-      
-            // 3️⃣ Crear Agent automático
-            const agent = await tx.agent.create({
-              data: {
-                name: `Agent - ${branch.name}`, // 🔥 EXTRA PRO
-                agentKey,
-                companyId: company.id,
-                branchId: branch.id,
-              },
-            });
+
+      // ========================
+      // CREAR AGENT AUTOMÁTICO
+      // ========================
+      const agentKey = crypto.randomBytes(32).toString("hex");
+
+      await tx.agent.create({
+        data: {
+          name: `Agent - ${branch.name}`,
+          agentKey,
+          companyId: company.id,
+          branchId: branch.id
+        }
+      });
 
       // ========================
       // CREAR ROLE OWNER
@@ -101,7 +261,7 @@ export const registerCompany = async (req, res) => {
           roleId: ownerRole.id,
           permissionId
         })),
-        skipDuplicates: true // 🔥 IMPORTANTE
+        skipDuplicates: true
       });
 
       // ========================
@@ -110,7 +270,7 @@ export const registerCompany = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // ========================
-      // CREAR USUARIO
+      // CREAR USER OWNER 🔥
       // ========================
       const user = await tx.user.create({
         data: {
@@ -118,7 +278,8 @@ export const registerCompany = async (req, res) => {
           email,
           password: hashedPassword,
           companyId: company.id,
-          branchId: branch.id
+          branchId: branch.id,
+          isOwner: true // 🔥 CLAVE
         }
       });
 
@@ -141,12 +302,16 @@ export const registerCompany = async (req, res) => {
           companyId: company.id,
           permissionId
         })),
-        skipDuplicates: true // 🔥 IMPORTANTE
+        skipDuplicates: true
       });
 
       return {
         company,
-        user
+        owner: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName
+        }
       };
     });
 
@@ -156,41 +321,112 @@ export const registerCompany = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ ERROR REGISTER COMPANY:", error); // 🔥 LOG REAL
+    console.error("❌ ERROR REGISTER COMPANY:", error);
+
     res.status(400).json({
       message: error.message || "Error creando empresa"
     });
   }
 };
-
 // =========================
 // 📋 LISTAR
 // =========================
+// export const getCompanies = async (req, res) => {
+//   try {
+//     const companies = await prisma.company.findMany({
+//       include: {
+//         companyPermissions: true,
+//         branches: {
+//           include: {
+//             agents: true, // 🔥 opcional pero recomendado
+//             users:true // 🔥 opcional pero recomendado
+//           }
+//         }
+//       }
+//     });
+
+//     res.json(companies);
+
+//   } catch (error) {
+    
+
+//     res.status(500).json({
+//       message: "Error obteniendo empresas"
+//     });
+//   }
+// };
 export const getCompanies = async (req, res) => {
   try {
     const companies = await prisma.company.findMany({
       include: {
-        companyPermissions: true,
+        // 🔐 permisos de la empresa
+        companyPermissions: {
+          select: {
+            permissionId: true
+          }
+        },
+
+        // 👤 SOLO EL OWNER
+        users: {
+          where: { isOwner: true },
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+            isActive: true
+          }
+        },
+
+        // 🏢 sucursales
         branches: {
           include: {
-            agents: true, // 🔥 opcional pero recomendado
-            users:true // 🔥 opcional pero recomendado
+            agents: true, // para tu vista de estado del agent
+            users: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+                isActive: true
+              }
+            }
           }
         }
+      },
+      orderBy: {
+        createdAt: "desc"
       }
     });
 
-    res.json(companies);
+    // =========================
+    // 🔥 FORMATEO FINAL
+    // =========================
+    const result = companies.map((c) => ({
+      id: c.id,
+      name: c.name,
+      isActive: c.isActive,
+      logoUrl: c.logoUrl,
+      createdAt: c.createdAt,
+
+      // 👤 owner limpio
+      owner: c.users[0] || null,
+
+      // 🔐 permisos simplificados (solo ids)
+      permissions: c.companyPermissions.map(p => p.permissionId),
+
+      // 🏢 sucursales completas
+      branches: c.branches
+    }));
+
+    res.json(result);
 
   } catch (error) {
-    
+    console.error("❌ ERROR GET COMPANIES:", error);
 
     res.status(500).json({
       message: "Error obteniendo empresas"
     });
   }
 };
-
 // =========================
 // 🔍 OBTENER POR ID
 // =========================
@@ -225,36 +461,153 @@ export const getCompanyById = async (req, res) => {
 // =========================
 // ✏️ UPDATE
 // =========================
+// export const updateCompany = async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const { permissions, ...data } = req.body;
+
+//     const result = await prisma.$transaction(async (tx) => {
+
+//       const company = await tx.company.findUnique({
+//         where: { id }
+//       });
+
+//       if (!company) {
+//         throw new Error("Empresa no encontrada");
+//       }
+
+//       const updateData = {};
+
+//       if (data.name !== undefined) {
+//         updateData.name = data.name;
+//       }
+
+//       // 🏢 update company
+//       await tx.company.update({
+//         where: { id },
+//         data: updateData
+//       });
+
+//       // 🔐 actualizar permisos
+//       if (permissions) {
+//         await tx.companyPermission.deleteMany({
+//           where: { companyId: id }
+//         });
+
+//         await tx.companyPermission.createMany({
+//           data: permissions.map((permissionId) => ({
+//             companyId: id,
+//             permissionId
+//           }))
+//         });
+//       }
+
+//       return true;
+//     });
+
+//     res.json({
+//       message: "Empresa actualizada correctamente"
+//     });
+
+//   } catch (error) {
+    
+
+//     res.status(400).json({
+//       message: error.message || "Error actualizando empresa"
+//     });
+//   }
+// };
+
 export const updateCompany = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const { permissions, ...data } = req.body;
+    const { name, email, fullName, password, permissions } = req.body;
 
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
 
+      // =========================
+      // 🔍 EMPRESA + OWNER
+      // =========================
       const company = await tx.company.findUnique({
-        where: { id }
+        where: { id },
+        include: {
+          users: {
+            where: { isOwner: true }
+          }
+        }
       });
 
       if (!company) {
         throw new Error("Empresa no encontrada");
       }
 
-      const updateData = {};
+      const owner = company.users[0];
 
-      if (data.name !== undefined) {
-        updateData.name = data.name;
+      // =========================
+      // 🔥 VALIDAR EMAIL ÚNICO
+      // =========================
+      if (email) {
+        const existingUser = await tx.user.findUnique({
+          where: { email }
+        });
+
+        if (existingUser && existingUser.id !== owner?.id) {
+          throw new Error("El email ya está en uso");
+        }
       }
 
-      // 🏢 update company
-      await tx.company.update({
-        where: { id },
-        data: updateData
-      });
+      // =========================
+      // 👤 UPDATE OWNER
+      // =========================
+      if (owner) {
+        const userData = {};
 
-      // 🔐 actualizar permisos
+        if (email !== undefined) userData.email = email;
+        if (fullName !== undefined) userData.fullName = fullName;
+
+        // 🔐 password opcional
+        if (password) {
+          userData.password = await bcrypt.hash(password, 10);
+        }
+
+        if (Object.keys(userData).length > 0) {
+          await tx.user.update({
+            where: { id: owner.id },
+            data: userData
+          });
+        }
+      }
+
+      // =========================
+      // 🏢 UPDATE COMPANY
+      // =========================
+      if (name !== undefined) {
+        await tx.company.update({
+          where: { id },
+          data: { name }
+        });
+      }
+
+      // =========================
+      // 🔐 PERMISOS EMPRESA
+      // =========================
       if (permissions) {
+
+        // validar permisos
+        const validPermissions = await tx.permission.findMany({
+          where: {
+            id: { in: permissions },
+            scope: "TENANT"
+          }
+        });
+
+        if (validPermissions.length !== permissions.length) {
+          throw new Error("Permisos inválidos detectados");
+        }
+
+        // reset permisos
         await tx.companyPermission.deleteMany({
           where: { companyId: id }
         });
@@ -263,11 +616,33 @@ export const updateCompany = async (req, res) => {
           data: permissions.map((permissionId) => ({
             companyId: id,
             permissionId
-          }))
+          })),
+          skipDuplicates: true
         });
-      }
 
-      return true;
+        // 🔥 (OPCIONAL PERO PRO)
+        // actualizar también permisos del ROLE OWNER
+        const ownerRole = await tx.role.findFirst({
+          where: {
+            companyId: id,
+            name: "OWNER"
+          }
+        });
+
+        if (ownerRole) {
+          await tx.rolePermission.deleteMany({
+            where: { roleId: ownerRole.id }
+          });
+
+          await tx.rolePermission.createMany({
+            data: permissions.map((permissionId) => ({
+              roleId: ownerRole.id,
+              permissionId
+            })),
+            skipDuplicates: true
+          });
+        }
+      }
     });
 
     res.json({
@@ -275,14 +650,13 @@ export const updateCompany = async (req, res) => {
     });
 
   } catch (error) {
-    
+    console.error("❌ ERROR UPDATE COMPANY:", error);
 
     res.status(400).json({
       message: error.message || "Error actualizando empresa"
     });
   }
 };
-
 // =========================
 // ❌ DELETE (soft)
 // =========================

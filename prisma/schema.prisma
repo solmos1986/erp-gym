@@ -90,6 +90,8 @@ model User {
   password String
   fullName String
 
+  isOwner Boolean @default(false)
+  
   isActive Boolean @default(true)
 
   companyId String
