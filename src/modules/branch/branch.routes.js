@@ -23,7 +23,7 @@ router.get(
 // =========================
 router.post(
   "/",
-  requirePermission("TENANT_BRANCH_CREATE"),
+  requirePermission("SYSTEM_BRANCH_CREATE"),
   createBranch
 );
 export default router;
