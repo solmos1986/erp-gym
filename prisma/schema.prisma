@@ -53,6 +53,7 @@ enum CommandType {
   SYNC_MEMBERSHIP
   SYNC_FACE
   DELETE_USER
+  SYNC_USER_FULL
 }
 /////////////////////////
 // CORE
