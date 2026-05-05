@@ -346,22 +346,26 @@ export const syncMembershipStatus = async ({ customerId, companyId }) => {
     membership.endDate >= now;  
 
  const baseUrl = process.env.BASE_URL;
-await tx.command.create({
-  data: {
-    type: "SYNC_USER_FULL",
-    payload: {
-      userId: membership.customer.id,
-      name: membership.customer.name,
-      startDate: membership.startDate.toISOString(),
-      endDate: membership.endDate.toISOString(),
-      imagePath: membership.customer.imageUrl
-        ? `${baseUrl}/${membership.customer.imageUrl}`
-        : null
-    },
-    membershipSaleId: sale.id,
-    companyId,
-    branchId
-  }
+ await prisma.$transaction(async (tx) => {
+  await tx.command.create({
+    data: {
+      type: "SYNC_USER_FULL",
+      payload: {
+        userId: membership.customer.id,
+        name: membership.customer.name,
+        startDate: membership.startDate.toISOString(),
+        endDate: membership.endDate.toISOString(),
+        imagePath: membership.customer.imageUrl
+          ? `${baseUrl}/${membership.customer.imageUrl}`
+          : null
+      },
+      companyId,
+      branchId: membership.branchId
+    }
+  });
+});
+await prisma.command.create({
+  
 });
 sendCommandToAgent(companyId, branchId, {
   type: 'SYNC'
