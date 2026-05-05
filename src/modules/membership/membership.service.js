@@ -92,41 +92,59 @@ export const purchase = async ({
       }
     });
 
-    // 🔥 SYNC MEMBERSHIP
-    await tx.command.create({
-      data: {
-        type: "SYNC_MEMBERSHIP",
-        payload: {
-          membershipId: membership.id,
-          clientId: partnerId,
-          name: partner.name,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        },
-        membershipSaleId: sale.id,
-        companyId,
-        branchId
-      }
-    });
+    // // 🔥 SYNC MEMBERSHIP
+    // await tx.command.create({
+    //   data: {
+    //     type: "SYNC_MEMBERSHIP",
+    //     payload: {
+    //       membershipId: membership.id,
+    //       clientId: partnerId,
+    //       name: partner.name,
+    //       startDate: startDate.toISOString(),
+    //       endDate: endDate.toISOString()
+    //     },
+    //     membershipSaleId: sale.id,
+    //     companyId,
+    //     branchId
+    //   }
+    // });
 
-    // 🔥 SYNC FACE
-    const baseUrl = process.env.BASE_URL;
+    // // 🔥 SYNC FACE
+    // const baseUrl = process.env.BASE_URL;
 
-    await tx.command.create({
-      data: {
-        type: "SYNC_FACE",
-        payload: {
-          userId: partnerId,
-          name: partner.name,
-          imagePath: partner.imageUrl
-            ? `${baseUrl}/${partner.imageUrl}`
-            : null
-        },
-        membershipSaleId: sale.id,
-        companyId,
-        branchId
-      }
-    });
+    // await tx.command.create({
+    //   data: {
+    //     type: "SYNC_FACE",
+    //     payload: {
+    //       userId: partnerId,
+    //       name: partner.name,
+    //       imagePath: partner.imageUrl
+    //         ? `${baseUrl}/${partner.imageUrl}`
+    //         : null
+    //     },
+    //     membershipSaleId: sale.id,
+    //     companyId,
+    //     branchId
+    //   }
+    // });
+    // 🔥 SYNC USER FULL (usuario + rostro)
+await tx.command.create({
+  data: {
+    type: "SYNC_USER_FULL",
+    payload: {
+      userId: partnerId,
+      name: partner.name,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      imagePath: partner.imageUrl
+        ? `${baseUrl}/${partner.imageUrl}`
+        : null
+    },
+    membershipSaleId: sale.id,
+    companyId,
+    branchId
+  }
+});
 sendCommandToAgent(companyId, branchId, {
   type: 'SYNC'
 });
