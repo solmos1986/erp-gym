@@ -364,9 +364,7 @@ export const syncMembershipStatus = async ({ customerId, companyId }) => {
     }
   });
 });
-await prisma.command.create({
-  
-});
+
 sendCommandToAgent(companyId, branchId, {
   type: 'SYNC'
 });
