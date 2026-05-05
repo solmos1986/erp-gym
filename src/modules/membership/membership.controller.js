@@ -120,3 +120,15 @@ export const getMembershipReportPDF = async (req, res) => {
     res.status(500).json({ message: 'Error generating PDF' });
   }
 };
+//=========================
+// SYNC CUSTOMER MEMBERSHIP STATUS
+//=========================
+export const syncMembershipStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await membershipService.syncMembershipStatus(id, req.user.companyId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error syncing membership status' });
+  }
+};

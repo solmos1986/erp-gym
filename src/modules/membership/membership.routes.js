@@ -6,7 +6,7 @@ import {
   getMembershipById,
   getMembershipStatus,
   getAllStatus,
-  retryMembershipSale,getMembershipReportPDF
+  retryMembershipSale,getMembershipReportPDF, syncMembershipStatus
 } from "./membership.controller.js";
 
 import { requireAuth } from "../../middlewares/auth.middleware.js";
@@ -80,6 +80,19 @@ router.post(
   requirePermission("TENANT_MEMBERSHIP_CREATE"),
   retryMembershipSale
 );
+//=========================
+// SYNC CUSTOMER MEMBERSHIP STATUS
+//=========================
+router.post(
+  '/sync/:id',
+  requireAuth,
+  requirePermission("TENANT_MEMBERSHIP_EDIT"),
+  syncMembershipStatus
+);
+
+//=========================
+// CREATE CUSTOMER MEMBERSHIP STATUS
+//=========================
 
 
 export default router;

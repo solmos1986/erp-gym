@@ -311,3 +311,66 @@ export const retryMembershipSale = async ({
     },
   });
 };
+//=========================
+// SYNC CUSTOMER MEMBERSHIP STATUS
+//=========================
+
+export const syncMembershipStatus = async ({ customerId, companyId }) => {
+  const now = new Date();
+
+  // 1. Traer membership + customer
+  const membership = await prisma.customerMembership.findFirst({
+    where: {
+      customerId,
+      companyId
+    },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,          // ajusta si usas firstName/lastName
+          imageUrl: true      // ajusta nombre real del campo
+        }
+      }
+    }
+  });
+
+  // 2. Validaciones básicas
+  if (!membership) {
+    throw new Error('MEMBERSHIP_NOT_FOUND');
+  }
+
+  // 3. Calcular estado REAL
+  const isActive =
+    membership.startDate <= now &&
+    membership.endDate >= now;  
+
+ const baseUrl = process.env.BASE_URL;
+await tx.command.create({
+  data: {
+    type: "SYNC_USER_FULL",
+    payload: {
+      userId: membership.customer.id,
+      name: membership.customer.name,
+      startDate: membership.startDate.toISOString(),
+      endDate: membership.endDate.toISOString(),
+      imagePath: membership.customer.imageUrl
+        ? `${baseUrl}/${membership.customer.imageUrl}`
+        : null
+    },
+    membershipSaleId: sale.id,
+    companyId,
+    branchId
+  }
+});
+sendCommandToAgent(companyId, branchId, {
+  type: 'SYNC'
+});
+notifyFrontend({
+  type: "MEMBERSHIP_UPDATE"
+});
+
+  return {
+    success: true
+  };
+};
