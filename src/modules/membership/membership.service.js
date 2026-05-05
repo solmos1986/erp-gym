@@ -110,7 +110,7 @@ export const purchase = async ({
     // });
 
     // // 🔥 SYNC FACE
-    // const baseUrl = process.env.BASE_URL;
+     const baseUrl = process.env.BASE_URL;
 
     // await tx.command.create({
     //   data: {
