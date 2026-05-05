@@ -126,7 +126,10 @@ export const getMembershipReportPDF = async (req, res) => {
 export const syncMembershipStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    await membershipService.syncMembershipStatus(id, req.user.companyId);
+    await membershipService.syncMembershipStatus({
+  customerId: id,
+  companyId: req.user.companyId
+});
     res.json({ success: true });
   } catch (error) {
   console.error(error); // 🔥 IMPORTANTE
