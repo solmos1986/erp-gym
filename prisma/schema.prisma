@@ -225,7 +225,7 @@ model Partner {
 
   company Company @relation(fields: [companyId], references: [id])
 
-  memberships      CustomerMembership[]
+  membership      CustomerMembership[]
   membershipSales  MembershipSale[]
 
   @@index([companyId])

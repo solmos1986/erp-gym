@@ -233,6 +233,11 @@ for (const role of roles) {
       scope: 'TENANT'
     },
     {
+      code: 'TENANT_MEMBERSHIP_ASSIGN',
+      description: 'Asignar membresías',
+      scope: 'TENANT'
+    },
+    {
       code: 'TENANT_DEVICES_VIEW',
       description: 'Ver dispositivos',
       scope: 'TENANT'

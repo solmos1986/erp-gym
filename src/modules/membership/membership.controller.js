@@ -136,3 +136,26 @@ export const syncMembershipStatus = async (req, res) => {
   res.status(500).json({ message: error.message });
 }
 };
+
+//=========================
+// ASIGNAR CUSTOMER MEMBERSHIP STATUS
+//=========================
+export const assignMembership = async (req, res) => {
+  try {
+    const { customerId, startDate, endDate } = req.body;
+
+    const result = await membershipService.assignMembership({
+      customerId,
+      companyId: req.user.companyId,
+      branchId: req.user.branchId,
+      startDate,
+      endDate
+    });
+
+    res.json(result);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};

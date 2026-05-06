@@ -376,3 +376,100 @@ notifyFrontend({
     success: true
   };
 };
+//=========================
+// ASSIGN CUSTOMER MEMBERSHIP
+//=========================
+export const assignMembership = async ({
+  customerId,
+  companyId,
+  branchId,
+  startDate,
+  endDate
+}) => {
+
+  // =====================
+  // VALIDACIONES
+  // =====================
+  if (!customerId || !startDate || !endDate) {
+    throw new Error('INVALID_DATA');
+  }
+
+  if (new Date(startDate) > new Date(endDate)) {
+    throw new Error('INVALID_DATES');
+  }
+
+  // validar cliente
+  const customer = await prisma.partner.findFirst({
+    where: {
+      id: customerId,
+      companyId
+    }
+  });
+
+  if (!customer) {
+    throw new Error('CUSTOMER_NOT_FOUND');
+  }
+
+  // =====================
+  // UPSERT MEMBERSHIP
+  // =====================
+  const membership = await prisma.customerMembership.upsert({
+    where: {
+      customerId
+    },
+    update: {
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status: 'ACTIVE',
+      branchId
+    },
+    create: {
+      customerId,
+      companyId,
+      branchId,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status: 'ACTIVE'
+    }
+  });
+
+  // =====================
+  // CREAR COMMAND DIRECTO (igual que sync)
+  // =====================
+  const baseUrl = process.env.BASE_URL;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.command.create({
+      data: {
+        type: "SYNC_USER_FULL",
+        payload: {
+          userId: customer.id,
+          name: customer.name,
+          startDate: new Date(startDate).toISOString(),
+          endDate: new Date(endDate).toISOString(),
+          imagePath: customer.imageUrl
+            ? `${baseUrl}/${customer.imageUrl}`
+            : null
+        },
+        companyId,
+        branchId
+      }
+    });
+  });
+
+  // =====================
+  // DISPARAR AGENT
+  // =====================
+  sendCommandToAgent(companyId, branchId, {
+    type: 'SYNC'
+  });
+
+  notifyFrontend({
+    type: "MEMBERSHIP_UPDATE"
+  });
+
+  return {
+    success: true,
+    membership
+  };
+};

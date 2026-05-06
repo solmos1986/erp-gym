@@ -96,8 +96,11 @@ export const getPartners = async (req, res) => {
   try {
     const partners = await prisma.partner.findMany({
       where: applyTenantFilter(req),
-      orderBy: { createdAt: "desc" }
-    });
+      orderBy: { createdAt: "desc" },
+      include: {
+        memberships: true // 🔗 incluir membresías 
+         }
+     });
 
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
 
