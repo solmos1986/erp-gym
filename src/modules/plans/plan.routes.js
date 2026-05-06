@@ -70,7 +70,7 @@ router.delete(
 // =========================
 // ✅ ACTIVAR PLAN
 // =========================
-router.patch(
+router.put(
   "/:id/activate",
   requireAuth,
   requirePermission("TENANT_PLANS_EDIT"),
