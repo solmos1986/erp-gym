@@ -63,7 +63,7 @@ export const purchase = async ({
 
     if (current && current.endDate >= today) {
        startDate = startOfDay(current.startDate);
-      startDateMembershipSale = endOfDay(current.endDate);
+      startDateMembershipSale = startOfDay(current.endDate);
       endDate = endOfDay(addDays(startDateMembershipSale, plan.durationDays) );
     } else {
       startDate = startOfDay(today);
