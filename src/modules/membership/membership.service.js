@@ -8,6 +8,18 @@ const addDays = (date, days) => {
   result.setDate(result.getDate() + days);
   return result;
 };
+// helpers de fecha
+const startOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const endOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+};
 
 // =========================
 // 💰 PURCHASE (CORE)
@@ -50,13 +62,13 @@ export const purchase = async ({
     });
 
     if (current && current.endDate >= today) {
-      startDate = current.startDate;
-      startDateMembershipSale = current.endDate;
-      endDate = addDays(startDateMembershipSale, plan.durationDays);
+       startDate = startOfDay(current.startDate);
+      startDateMembershipSale = endOfDay(current.endDate);
+      endDate = endOfDay(addDays(startDateMembershipSale, plan.durationDays) );
     } else {
-      startDate = today;
-      endDate = addDays(startDate, plan.durationDays);
-      startDateMembershipSale = startDate;
+      startDate = startOfDay(today);
+      endDate = endOfDay(addDays(startDate, plan.durationDays));
+      startDateMembershipSale = startOfDay(startDate);
     }
 
     // 🧱 upsert membresía
