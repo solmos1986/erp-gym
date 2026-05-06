@@ -112,12 +112,9 @@ export const getPartners = async (req, res) => {
     res.json(partnersWithUrl);
 
   } catch (error) {
-    
-
-    res.status(500).json({
-      message: "Error obteniendo clientes"
-    });
-  }
+  console.error(error); // 🔥 AGREGA ESTO
+  res.status(500).json({ message: 'Error obteniendo clientes' });
+}
 };
 
 // =========================
