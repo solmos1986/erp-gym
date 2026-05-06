@@ -102,7 +102,7 @@ router.post(
 // =========================
 // 🖼️ ACTIVAR PARTNER
 // =========================
-router.patch(
+router.put(
   "/:id/activate",
   requireAuth,
   requirePermission("TENANT_PARTNER_EDIT"),
