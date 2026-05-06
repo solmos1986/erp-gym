@@ -5,7 +5,8 @@ import {
   getPlans,
   getPlanById,
   updatePlan,
-  deletePlan
+  deletePlan,
+  activatePlan
 } from "./plan.controller.js";
 
 import { requireAuth } from "../../middlewares/auth.middleware.js";
@@ -64,6 +65,17 @@ router.delete(
   requireAuth,
   requirePermission("TENANT_PLANS_DELETE"),
   deletePlan
+);
+
+// =========================
+// ✅ ACTIVAR PLAN
+// =========================
+router.patch(
+  "/:id/activate",
+  requireAuth,
+  requirePermission("TENANT_PLANS_EDIT"),
+  tenantGuard,
+  activatePlan
 );
 
 export default router;

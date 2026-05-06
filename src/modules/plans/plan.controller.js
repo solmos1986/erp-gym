@@ -234,3 +234,21 @@ export const deletePlan = async (req, res) => {
     });
   }
 };
+// =========================
+// ✅ ACTIVAR PLAN
+// =========================
+export const activatePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.plan.update({
+      where: { id },
+      data: { isActive: true }
+    });
+
+    res.json({ success: true });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error activating plan' });
+  }
+};
