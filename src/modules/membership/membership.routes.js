@@ -87,7 +87,7 @@ router.post(
 // ASIGNAR CUSTOMER MEMBERSHIP STATUS
 //=========================
 router.post(
-  '/assing',
+  '/assign',
   requireAuth,
   requirePermission("TENANT_MEMBERSHIP_ASSIGN"),
   assignMembership
