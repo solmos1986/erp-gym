@@ -9,7 +9,7 @@ import {
   retryMembershipSale,
   getMembershipReportPDF, 
   syncMembershipStatus,
-  assignMembershipStatus
+  assignMembership 
 } from "./membership.controller.js";
 
 import { requireAuth } from "../../middlewares/auth.middleware.js";
@@ -90,7 +90,7 @@ router.post(
   '/assing',
   requireAuth,
   requirePermission("TENANT_MEMBERSHIP_ASSIGN"),
-  assignMembershipStatus
+  assignMembership
 );
 //=========================
 // SYNC CUSTOMER MEMBERSHIP STATUS
