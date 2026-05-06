@@ -30,14 +30,14 @@ export const login = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentialses" });
+      return res.status(401).json({ message: "Usuario Invalido" });
     }
 
     // 🔐 Validar password
     const valid = await bcrypt.compare(password, user.password);
 
     if (!valid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Contraseña Invalida" });
     }
 
     // ==========================
