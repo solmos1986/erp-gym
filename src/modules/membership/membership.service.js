@@ -70,6 +70,7 @@ export const purchase = async ({
       endDate = endOfDay(addDays(startDate, plan.durationDays));
       startDateMembershipSale = startOfDay(startDate);
     }
+    console.log("Fechas calculadas:", { startDate, endDate, startDateMembershipSale });
 
     // 🧱 upsert membresía
     const membership = await tx.customerMembership.upsert({
