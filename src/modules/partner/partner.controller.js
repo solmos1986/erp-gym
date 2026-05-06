@@ -98,7 +98,7 @@ export const getPartners = async (req, res) => {
       where: applyTenantFilter(req),
       orderBy: { createdAt: "desc" },
       include: {
-        memberships: true // 🔗 incluir membresías 
+        membership: true // 🔗 incluir membresías 
          }
      });
 
