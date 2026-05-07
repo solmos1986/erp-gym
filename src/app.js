@@ -25,7 +25,7 @@ const app = express();
 // 🔥 MIDDLEWARES GLOBALES
 // =============================
 app.use(cors({
-  origin: 'https://gymcloud.aplus-security.com', // Reemplaza esto con el dominio de tu frontend
+  origin: ['https://gymcloud.aplus-security.com','http://localhost:5173'], // Reemplaza esto con el dominio de tu frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true // Si estás utilizando cookies o sesiones
 }));
