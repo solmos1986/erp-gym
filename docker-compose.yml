@@ -1,23 +1,18 @@
 services:
-backend:
-  container_name: erp_backend
-  image: erp_backend
-  build: .
-
-  ports:
-    - "3000:3000"
-
-  env_file:
-    - .env
-
-  volumes:
+  backend:
+    container_name: erp_backend
+    image: erp_backend
+    build: .
+    ports:
+      - "3000:3000"  # Exponer el puerto 3000 para el backend
+    env_file:
+      - .env
+    volumes:
     - /www/uploads:/app/uploads
-
-  depends_on:
-    - postgres
-
-  networks:
-    - default
+    depends_on:
+      - postgres  # Asegúrate de que el backend dependa de PostgreSQL
+    networks:
+      - default  # Usamos la red predeterminada de Docker
 
   postgres:
     container_name: erp_postgres
