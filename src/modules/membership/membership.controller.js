@@ -111,13 +111,32 @@ export const retryMembershipSale = async (req, res) => {
 //=========================
 export const getMembershipReportPDF = async (req, res) => {
   try {
+    
     const data = await membershipService.getAll(req); // 🔥 reutilizas filtros
+    const uniquePartners = [
+      ...new Set(
+        data.map(item => item.partner?.name)
+      )
+    ];
+
+    const partnerName =
+      uniquePartners.length === 1
+        ? uniquePartners[0]
+        : 'TODOS';
     const filters = {
-      partner: data[0]?.partner?.name || 'TODOS',
-      plan: data[0]?.plan?.name || 'TODOS',
-      user: data[0]?.user?.fullName || 'TODOS',
+      partner: partnerName,
+      plan: req.query.plan
+        ? data[0]?.plan?.name || 'TODOS'
+        : 'TODOS',
+
+      user: req.query.user
+        ? data[0]?.user?.fullName || 'TODOS'
+        : 'TODOS',
+
       from: req.query.from || 'TODOS',
+
       to: req.query.to || 'TODOS',
+
       status: req.query.status || 'TODOS'
     };
     console.log('Query de PDF', req.query);
