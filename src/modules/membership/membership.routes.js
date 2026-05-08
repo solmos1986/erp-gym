@@ -98,7 +98,7 @@ router.post(
 router.post(
   '/sync/:id',
   requireAuth,
-  requirePermission("TENANT_MEMBERSHIP_EDIT"),
+  requirePermission("TENANT_MEMBERSHIP_SYNC"),
   syncMembershipStatus
 );
 
