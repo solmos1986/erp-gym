@@ -84,7 +84,7 @@ router.post(
   retryMembershipSale
 );
 //=========================
-// ASIGNAR CUSTOMER MEMBERSHIP STATUS
+// ASIGNAR CUSTOMER MEMBERSHIP
 //=========================
 router.post(
   '/assign',

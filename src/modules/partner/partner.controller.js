@@ -228,7 +228,7 @@ export const updatePartner = async (req, res) => {
 // =========================
 export const deletePartner = async (req, res) => {
   const { id } = req.params;
-
+  console.log("Intentando desactivar cliente req.user.branchId:", req.user.branchId); // 🔥 LOG DE DEPURACIÓN
   try {
     const partner = await prisma.partner.findFirst({
       where: {
@@ -236,6 +236,7 @@ export const deletePartner = async (req, res) => {
         ...applyTenantFilter(req)
       }
     });
+    console.log("Cliente encontrado:", partner); // 🔥 LOG DE DEPURACIÓN
 
     if (!partner) {
       return res.status(404).json({
@@ -248,13 +249,39 @@ export const deletePartner = async (req, res) => {
       data: { isActive: false }
     });
 
+      // =====================
+      // CREAR COMMAND DIRECTO (igual que sync)
+      // =====================
+      const baseUrl = process.env.BASE_URL;
+      await prisma.$transaction(async (tx) => {
+        await tx.command.create({
+          data: {
+            type: "DELETE_USER",
+            payload: {
+              userId: partner.id,
+              name: partner.name
+            },
+            companyId: partner.companyId,
+            branchId: req.user.branchId
+          }
+        });
+      });
+    
+      // =====================
+      // DISPARAR AGENT
+      // =====================
+      sendCommandToAgent(companyId, branchId, {
+        type: 'SYNC'
+      });
+
     res.json({ message: "Cliente desactivado" });
+
 
   } catch (error) {
     
 
     res.status(500).json({
-      message: "Error eliminando cliente"
+      message: "Error eliminando cliente", error: error.message
     });
   }
 };
