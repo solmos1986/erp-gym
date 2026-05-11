@@ -30,7 +30,7 @@ app.use(cors({
   credentials: true // Si estás utilizando cookies o sesiones
 }));
 startMembershipExpirationJob();
-//app.set('trust proxy', true);
+app.set('trust proxy', true);
 app.use(express.json());
 
 // 🔥🔥🔥 IMPORTANTE (SERVIR IMÁGENES)
