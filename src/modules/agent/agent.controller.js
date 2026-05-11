@@ -62,12 +62,13 @@ export const agentHeartbeat = async (req, res) => {
   try {
     const agent = req.agent // 🔥 viene del middleware
     const { devices } = req.body
-
+    const publicIp = req.ip;
     // 💓 actualizar agent
     await prisma.agent.update({
       where: { id: agent.id },
       data: {
-        lastSeenAt: new Date()
+        lastSeenAt: new Date(),
+        publicIp: publicIp
       }
     })
 
