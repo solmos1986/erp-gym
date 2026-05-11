@@ -45,7 +45,7 @@ export const login = async (req, res) => {
      // ==========================
     // 🌐 OBTENER IP PUBLICA REAL
     // ==========================
-    //const clientIp = req.ip.replace('::ffff:', '');
+    const clientIp = req.ip.replace('::ffff:', '');
     // ==========================
     // 🛡️ VALIDAR CAJEROS POR IP
     // ==========================
