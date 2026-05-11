@@ -45,50 +45,50 @@ export const login = async (req, res) => {
      // ==========================
     // 🌐 OBTENER IP PUBLICA REAL
     // ==========================
-    const clientIp = req.ip.replace('::ffff:', '');
+    //const clientIp = req.ip.replace('::ffff:', '');
     // ==========================
     // 🛡️ VALIDAR CAJEROS POR IP
     // ==========================
-    const cashierRoles = ["CAJA", "CAJERO"];
+    // const cashierRoles = ["CAJA", "CAJERO"];
 
-    const isCashier = user.roles.some(
-      (r) => cashierRoles.includes(r.role.name?.toUpperCase())
-    );
+    // const isCashier = user.roles.some(
+    //   (r) => cashierRoles.includes(r.role.name?.toUpperCase())
+    // );
 
-    if (isCashier) {
+    // if (isCashier) {
 
-      // Buscar agent activo de la sucursal
-      const agent = await prisma.agent.findFirst({
-        where: {
-          branchId: user.branchId,
-          isActive: true
-        }
-      });
+    //   // Buscar agent activo de la sucursal
+    //   const agent = await prisma.agent.findFirst({
+    //     where: {
+    //       branchId: user.branchId,
+    //       isActive: true
+    //     }
+    //   });
 
-      // No existe agent
-      if (!agent) {
-        return res.status(403).json({
-          message: "No existe un agent activo para esta sucursal"
-        });
-      }
+    //   // No existe agent
+    //   if (!agent) {
+    //     return res.status(403).json({
+    //       message: "No existe un agent activo para esta sucursal"
+    //     });
+    //   }
 
-      // Agent sin IP aún
-      if (!agent.publicIp) {
-        return res.status(403).json({
-          message: "El agent aún no reportó IP pública"
-        });
-      }
+    //   // Agent sin IP aún
+    //   if (!agent.publicIp) {
+    //     return res.status(403).json({
+    //       message: "El agent aún no reportó IP pública"
+    //     });
+    //   }
 
-      console.log('CLIENT IP:', clientIp);
-      console.log('AGENT  IP:', agent.publicIp);
+    //   console.log('CLIENT IP:', clientIp);
+    //   console.log('AGENT  IP:', agent.publicIp);
 
-      // Comparar IPs
-      if (clientIp !== agent.publicIp) {
-        return res.status(403).json({
-          message: "Debes iniciar sesión desde el gimnasio"
-        });
-      }
-    }
+    //   // Comparar IPs
+    //   if (clientIp !== agent.publicIp) {
+    //     return res.status(403).json({
+    //       message: "Debes iniciar sesión desde el gimnasio"
+    //     });
+    //   }
+    // }
     // ==========================
     // 🔥 SEPARAR ROLES
     // ==========================
