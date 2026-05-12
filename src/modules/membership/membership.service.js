@@ -431,8 +431,8 @@ export const assignMembership = async ({
       customerId
     },
     update: {
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: startDate,
+      endDate: endDate,
       status: 'ACTIVE',
       branchId
     },
@@ -440,8 +440,8 @@ export const assignMembership = async ({
       customerId,
       companyId,
       branchId,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: startDate,
+      endDate: endDate,
       status: 'ACTIVE'
     }
   });
