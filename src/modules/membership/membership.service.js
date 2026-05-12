@@ -458,8 +458,8 @@ export const assignMembership = async ({
         payload: {
           userId: customer.id,
           name: customer.name,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
+          startDate: startDate,
+          endDate: endDate,
           imagePath: customer.imageUrl
             ? `${baseUrl}/${customer.imageUrl}`
             : null
