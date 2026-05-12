@@ -407,7 +407,7 @@ export const assignMembership = async ({
     throw new Error('INVALID_DATA');
   }
 
-  if (startDate.toISOString() > endDate.toISOString()) {
+  if (startDate > endDate) {
     throw new Error('INVALID_DATES');
   }
 
@@ -431,8 +431,8 @@ export const assignMembership = async ({
       customerId
     },
     update: {
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+      startDate: startDate,
+      endDate: endDate,
       status: 'ACTIVE',
       branchId
     },
@@ -440,8 +440,8 @@ export const assignMembership = async ({
       customerId,
       companyId,
       branchId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+      startDate: startDate,
+      endDate: endDate,
       status: 'ACTIVE'
     }
   });
