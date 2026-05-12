@@ -407,7 +407,7 @@ export const assignMembership = async ({
     throw new Error('INVALID_DATA');
   }
 
-  if (new Date(startDate) > new Date(endDate)) {
+  if (startDate > endDate) {
     throw new Error('INVALID_DATES');
   }
 
@@ -458,8 +458,8 @@ export const assignMembership = async ({
         payload: {
           userId: customer.id,
           name: customer.name,
-          startDate: new Date(startDate).toISOString(),
-          endDate: new Date(endDate).toISOString(),
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
           imagePath: customer.imageUrl
             ? `${baseUrl}/${customer.imageUrl}`
             : null
