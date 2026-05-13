@@ -6,6 +6,90 @@ const prisma = new PrismaClient();
 // =========================
 // ➕ CREAR PARTNER
 // =========================
+// export const createPartner = async (req, res) => {
+//   const { name, document, phone, email, address, type, imageUrl } = req.body;
+
+//   try {
+//     const result = await prisma.$transaction(async (tx) => {
+
+//       // 🔒 VALIDAR companyId
+//       if (!req.user.companyId) {
+//         throw new Error("CompanyId no definido");
+//       }
+
+//       // 🧠 NORMALIZAR TYPE
+//       const validTypes = ["CUSTOMER", "SUPPLIER"];
+//       const safeType = (type || "CUSTOMER").toUpperCase();
+
+//       if (!validTypes.includes(safeType)) {
+//         throw new Error("Tipo inválido");
+//       }
+
+
+
+//       // 🧼 SANITIZAR CAMPOS
+//       const cleanDocument = document ? String(document) : null;
+//       const cleanPhone = phone ? String(phone) : null;
+//       const cleanEmail = email || null;
+//       const cleanAddress = address || null;
+//       const cleanImageUrl = imageUrl?.trim() || null;
+
+//       // 🔍 VALIDAR DOCUMENTO ÚNICO
+//       if (cleanDocument) {
+//         const existing = await tx.partner.findFirst({
+//           where: {
+//             document: cleanDocument,
+//             companyId: req.user.companyId
+//           }
+//         });
+
+//         if (existing) {
+//           throw new Error("El documento ya está registrado");
+//         }
+//       }
+
+//       // ➕ CREAR PARTNER
+//       const partner = await tx.partner.create({
+//         data: {
+//           name,
+//           document: cleanDocument,
+//           phone: cleanPhone,
+//           email: cleanEmail,
+//           address: cleanAddress,
+//           type: safeType,
+//           company: {
+//             connect: { id: req.user.companyId }
+//           }
+//         }
+//       });
+
+//       // 🖼️ CREAR IMAGEN (solo si válida)
+//       if (cleanImageUrl) {
+//         await tx.partnerImage.create({
+//           data: {
+//             partnerId: partner.id,
+//             url: cleanImageUrl,
+//             isMain: true
+//           }
+//         });
+//       }
+
+//       return partner;
+//     });
+
+//     res.status(201).json({
+//       message: "Cliente creado correctamente",
+//       partner: result
+//     });
+
+//   } catch (error) {
+    
+
+//     res.status(400).json({
+//       message: error.message || "Error creando cliente"
+//     });
+//   }
+// };
 export const createPartner = async (req, res) => {
   const { name, document, phone, email, address, type, imageUrl } = req.body;
 
@@ -26,24 +110,27 @@ export const createPartner = async (req, res) => {
       }
 
       // 🧼 SANITIZAR CAMPOS
-      const cleanDocument = document ? String(document) : null;
+      const cleanDocument = document?.trim();
       const cleanPhone = phone ? String(phone) : null;
       const cleanEmail = email || null;
       const cleanAddress = address || null;
       const cleanImageUrl = imageUrl?.trim() || null;
 
-      // 🔍 VALIDAR DOCUMENTO ÚNICO
-      if (cleanDocument) {
-        const existing = await tx.partner.findFirst({
-          where: {
-            document: cleanDocument,
-            companyId: req.user.companyId
-          }
-        });
+      // 🚫 VALIDAR DOCUMENTO OBLIGATORIO
+      if (!cleanDocument) {
+        throw new Error("El documento es obligatorio");
+      }
 
-        if (existing) {
-          throw new Error("El documento ya está registrado");
+      // 🔍 VALIDAR DOCUMENTO ÚNICO
+      const existing = await tx.partner.findFirst({
+        where: {
+          document: cleanDocument,
+          companyId: req.user.companyId
         }
+      });
+
+      if (existing) {
+        throw new Error("El documento ya está registrado");
       }
 
       // ➕ CREAR PARTNER
@@ -81,7 +168,6 @@ export const createPartner = async (req, res) => {
     });
 
   } catch (error) {
-    
 
     res.status(400).json({
       message: error.message || "Error creando cliente"

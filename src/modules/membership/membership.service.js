@@ -20,7 +20,6 @@ const endOfDay = (date) => {
   d.setHours(23, 59, 59, 999);
   return d;
 };
-
 // =========================
 // 💰 PURCHASE (CORE)
 // =========================
@@ -50,12 +49,19 @@ export const purchase = async ({
       where: { id: userId, companyId }
     });
     if (!user) throw new Error("Usuario vendedor no válido");
-
+    
     const today = new Date();
     let startDate;
     let endDate;
     let startDateMembershipSale;
-
+    console.log('Valores originales:', {
+  startDate,
+  endDate
+});
+console.log('Tipos:', {
+  startDate: typeof startDate,
+  endDate: typeof endDate
+});
     // 🔍 membresía actual
     const current = await tx.customerMembership.findUnique({
       where: { customerId: partnerId }
@@ -392,6 +398,100 @@ notifyFrontend({
 //=========================
 // ASSIGN CUSTOMER MEMBERSHIP
 //=========================
+// export const assignMembership = async ({
+//   customerId,
+//   companyId,
+//   branchId,
+//   startDate,
+//   endDate
+// }) => {
+
+//   // =====================
+//   // VALIDACIONES
+//   // =====================
+//   if (!customerId || !startDate || !endDate) {
+//     throw new Error('INVALID_DATA');
+//   }
+
+//   if (startDate > endDate) {
+//     throw new Error('INVALID_DATES');
+//   }
+
+//   // validar cliente
+//   const customer = await prisma.partner.findFirst({
+//     where: {
+//       id: customerId,
+//       companyId
+//     }
+//   });
+
+//   if (!customer) {
+//     throw new Error('CUSTOMER_NOT_FOUND');
+//   }
+
+//   // =====================
+//   // UPSERT MEMBERSHIP
+//   // =====================
+//   const membership = await prisma.customerMembership.upsert({
+//     where: {
+//       customerId
+//     },
+//     update: {
+//       startDate: startDate,
+//       endDate: endDate,
+//       status: 'ACTIVE',
+//       branchId
+//     },
+//     create: {
+//       customerId,
+//       companyId,
+//       branchId,
+//       startDate: startDate,
+//       endDate: endDate,
+//       status: 'ACTIVE'
+//     }
+//   });
+
+//   // =====================
+//   // CREAR COMMAND DIRECTO (igual que sync)
+//   // =====================
+//   const baseUrl = process.env.BASE_URL;
+
+//   await prisma.$transaction(async (tx) => {
+//     await tx.command.create({
+//       data: {
+//         type: "SYNC_USER_FULL",
+//         payload: {
+//           userId: customer.id,
+//           name: customer.name,
+//           startDate: startDate,
+//           endDate: endDate,
+//           imagePath: customer.imageUrl
+//             ? `${baseUrl}/${customer.imageUrl}`
+//             : null
+//         },
+//         companyId,
+//         branchId
+//       }
+//     });
+//   });
+
+//   // =====================
+//   // DISPARAR AGENT
+//   // =====================
+//   sendCommandToAgent(companyId, branchId, {
+//     type: 'SYNC'
+//   });
+
+//   notifyFrontend({
+//     type: "MEMBERSHIP_UPDATE"
+//   });
+
+//   return {
+//     success: true,
+//     membership
+//   };
+// };
 export const assignMembership = async ({
   customerId,
   companyId,
@@ -407,10 +507,16 @@ export const assignMembership = async ({
     throw new Error('INVALID_DATA');
   }
 
-  if (startDate > endDate) {
+  // =====================
+  // NORMALIZAR FECHAS
+  // =====================
+    const normalizedStartDate = startOfDay(startDate);
+  const normalizedEndDate = endOfDay(endDate);
+
+  if (normalizedStartDate > normalizedEndDate) {
     throw new Error('INVALID_DATES');
   }
-
+console.log('Fechas normalizadas:', { normalizedStartDate, normalizedEndDate });
   // validar cliente
   const customer = await prisma.partner.findFirst({
     where: {
@@ -431,8 +537,8 @@ export const assignMembership = async ({
       customerId
     },
     update: {
-      startDate: startDate,
-      endDate: endDate,
+      startDate: normalizedStartDate,
+      endDate: normalizedEndDate,
       status: 'ACTIVE',
       branchId
     },
@@ -440,8 +546,8 @@ export const assignMembership = async ({
       customerId,
       companyId,
       branchId,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: normalizedStartDate,
+      endDate: normalizedEndDate,
       status: 'ACTIVE'
     }
   });
@@ -458,8 +564,8 @@ export const assignMembership = async ({
         payload: {
           userId: customer.id,
           name: customer.name,
-          startDate: startDate,
-          endDate: endDate,
+          startDate: normalizedStartDate,
+          endDate: normalizedEndDate,
           imagePath: customer.imageUrl
             ? `${baseUrl}/${customer.imageUrl}`
             : null
