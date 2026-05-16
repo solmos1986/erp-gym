@@ -141,12 +141,13 @@ doc.text(
   const tableTop = doc.y;
 
   const columns = [
-    { label: 'Cliente', x: 30 },
-    { label: 'Plan', x: 140 },
-    { label: 'Vendedor', x: 250 },
+    { label: 'Venta', x: 30 },
+    { label: 'Vendedor', x: 90 },
+    { label: 'Plan', x: 170 },
+    { label: 'Cliente', x: 260 },
     { label: 'Inicio', x: 360 },
     { label: 'Fin', x: 430 },
-    { label: 'Precio', x: 500 }
+    { label: 'Precio', x: 490 }
   ];
 
   columns.forEach(col => {
@@ -157,22 +158,35 @@ doc.text(
   let y = tableTop + 20;
 
   data.forEach((item) => {
-    doc.fontSize(9).font('Helvetica');
+  doc.fontSize(9).font('Helvetica');
+  // ✅ FECHA VENTA
+  doc.text(formatDate(item.saleDate), 30, y);
+  doc.text(item.user?.fullName || '-', 90, y);
+  doc.text(item.plan?.name || '-', 170, y);
+  doc.text(item.partner?.name || '-', 260, y);
+  // ✅ FECHA INICIO
+  doc.text(formatDate(item.startDate), 360, y);
 
-    doc.text(item.partner?.name || '-', 30, y);
-    doc.text(item.plan?.name || '-', 140, y);
-    doc.text(item.user?.fullName || '-', 250, y);
-    doc.text(formatDate(item.startDate), 360, y);
-    doc.text(formatDate(item.endDate), 430, y);
-    doc.text(`Bs ${Number(item.price || 0).toFixed(2)}`, 500, y);
+  // ✅ FECHA FIN
+  doc.text(formatDate(item.endDate), 430, y);
 
-    y += 20;
+  doc.text(
+  `Bs ${Number(item.price || 0).toFixed(2)}`,
+  490,
+  y,
+  {
+    width: 70,
+    lineBreak: false
+  }
+);
 
-    if (y > 750) {
-      doc.addPage();
-      y = 50;
-    }
-  });
+  y += 20;
+
+  if (y > 750) {
+    doc.addPage();
+    y = 50;
+  }
+});
 
   // 📌 Footer
   doc.moveDown(2);
