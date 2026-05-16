@@ -261,6 +261,10 @@ for (const role of roles) {
       code: 'TENANT_DEVICES_DELETE',
       description: 'Eliminar dispositivos',
       scope: 'TENANT'
+    },
+    { code: 'TENANT_DASHBOARD_VIEW', 
+      description: 'Ver dashboard', 
+      scope: 'TENANT' 
     }
 
   ];

@@ -17,7 +17,7 @@ import commandRoutes from "./modules/command/command.routes.js";
 import deviceRoutes from "./modules/device/device.routes.js";
 import agentRoutes from "./modules/agent/agent.routes.js";
 import { startMembershipExpirationJob } from './jobs/membershipsExpiration.job.js';
-
+import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
 
 const app = express();
 
@@ -64,6 +64,8 @@ app.use("/devices", deviceRoutes);
 app.use("/commands", commandRoutes);
 app.use("/agent", agentRoutes);
 
+// 📊 DASHBOARD
+app.use("/dashboard", dashboardRoutes);
 // Iniciar el servidor WebSocket
 //const wss = new WebSocketServer({ port: 8080 });
 
