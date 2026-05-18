@@ -251,7 +251,7 @@ export const getAll = async (req) => {
       'ANNULLED';
 
 }
-
+console.log('Where clause:', where);
   return await prisma.membershipSale.findMany({
     where,
     include: {
