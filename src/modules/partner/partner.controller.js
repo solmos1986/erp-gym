@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { applyTenantFilter } from "../../utils/tenant.util.js";
+import { sendCommandToAgent, notifyFrontend } from '../../lib/websocket.server.js';
 
 const prisma = new PrismaClient();
 
@@ -353,12 +354,13 @@ export const deletePartner = async (req, res) => {
         });
       });
     
-      // =====================
-      // DISPARAR AGENT
-      // =====================
       sendCommandToAgent(companyId, branchId, {
-        type: 'SYNC'
-      });
+          type: 'SYNC'
+        });
+      
+        notifyFrontend({
+          type: "MEMBERSHIP_UPDATE"
+        });
 
     res.json({ message: "Cliente desactivado" });
 
