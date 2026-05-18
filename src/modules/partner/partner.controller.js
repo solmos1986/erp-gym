@@ -354,13 +354,18 @@ export const deletePartner = async (req, res) => {
         });
       });
     
-      sendCommandToAgent(companyId, branchId, {
-          type: 'SYNC'
-        });
-      
-        notifyFrontend({
-          type: "MEMBERSHIP_UPDATE"
-        });
+       sendCommandToAgent(
+      partner.companyId,
+      req.user.branchId,
+      {
+        type: "SYNC"
+      }
+    );
+
+    notifyFrontend({
+      type: "MEMBERSHIP_UPDATE"
+    });
+
 
     res.json({ message: "Cliente desactivado" });
 
