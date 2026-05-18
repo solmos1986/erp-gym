@@ -742,6 +742,22 @@ export const annulMembershipSale = async ({
           }
 
         });
+        // =====================
+        // DISPARAR AGENT
+        // =====================
+        sendCommandToAgent(companyId, branchId, {
+          type: 'SYNC'
+        });
+
+        notifyFrontend({
+          type: "MEMBERSHIP_UPDATE"
+        });
+
+        return {
+          success: true,
+          membership
+        };
+      
 
       }
 
@@ -751,66 +767,80 @@ export const annulMembershipSale = async ({
 
       else {
 
-        await tx.customerMembership
-        .update({
+          await tx.customerMembership
+          .update({
 
-          where: {
-            customerId:
-              sale.partnerId
-          },
-
-          data: {
-            endDate:
-              newEndDate
-          }
-
-        });
-// =====================
-  // CREAR COMMAND DIRECTO (igual que sync)
-  // =====================
-  const baseUrl = process.env.BASE_URL;
-
-        await tx.command.create({
-
-          data: {
-
-            type:
-            'SYNC_USER_FULL',
-
-            payload: {
-
-              userId:
-                sale.partnerId,
-
-              name:
-                sale.partner.name,
-
-              startDate:
-                membership.startDate
-                .toISOString(),
-
-              endDate:
-                newEndDate
-                .toISOString(),
-
-              imagePath:
-                sale.partner
-                .imageUrl 
-                ? `${baseUrl}/${sale.partner.imageUrl}`
-            : null
+            where: {
+              customerId:
+                sale.partnerId
             },
 
-            membershipSaleId:
-              sale.id,
+            data: {
+              endDate:
+                newEndDate
+            }
 
-            companyId,
-            branchId
+          });
+        // =====================
+          // CREAR COMMAND DIRECTO (igual que sync)
+          // =====================
+          const baseUrl = process.env.BASE_URL;
 
+                await tx.command.create({
+
+                  data: {
+
+                    type:
+                    'SYNC_USER_FULL',
+
+                    payload: {
+
+                      userId:
+                        sale.partnerId,
+
+                      name:
+                        sale.partner.name,
+
+                      startDate:
+                        membership.startDate
+                        .toISOString(),
+
+                      endDate:
+                        newEndDate
+                        .toISOString(),
+
+                      imagePath:
+                        sale.partner
+                        .imageUrl 
+                        ? `${baseUrl}/${sale.partner.imageUrl}`
+                    : null
+                    },
+
+                    membershipSaleId:
+                      sale.id,
+
+                    companyId,
+                    branchId
+
+                  }
+
+                });
           }
+        // =====================
+          // DISPARAR AGENT
+          // =====================
+          sendCommandToAgent(companyId, branchId, {
+            type: 'SYNC'
+          });
 
-        });
+          notifyFrontend({
+            type: "MEMBERSHIP_UPDATE"
+          });
 
-      }
+          return {
+            success: true,
+            membership
+          };
 
       return true;
 
