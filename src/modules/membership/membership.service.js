@@ -765,6 +765,10 @@ export const annulMembershipSale = async ({
           }
 
         });
+// =====================
+  // CREAR COMMAND DIRECTO (igual que sync)
+  // =====================
+  const baseUrl = process.env.BASE_URL;
 
         await tx.command.create({
 
@@ -791,7 +795,9 @@ export const annulMembershipSale = async ({
 
               imagePath:
                 sale.partner
-                .imageUrl
+                .imageUrl 
+                ? `${baseUrl}/${sale.partner.imageUrl}`
+            : null
             },
 
             membershipSaleId:
