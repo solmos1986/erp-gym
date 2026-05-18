@@ -592,3 +592,223 @@ console.log('Fechas normalizadas:', { normalizedStartDate, normalizedEndDate });
     membership
   };
 };
+//=========================
+// ANULAR MEMBERSHIP (SOFT DELETE)
+//=========================
+export const annulMembershipSale = async ({
+  saleId,
+  companyId,
+  branchId,
+  userId
+}) => {
+
+  return await prisma.$transaction(
+    async (tx) => {
+
+      const sale =
+        await tx.membershipSale.findFirst({
+
+        where: {
+          id: saleId,
+          companyId
+        },
+
+        include: {
+          plan: true,
+          partner: true
+        }
+
+      });
+
+      if (!sale)
+        throw new Error(
+          'Inscripción no encontrada'
+        );
+
+      if (
+        sale.status ===
+        'ANNULLED'
+      ) {
+        throw new Error(
+          'Ya fue anulada'
+        );
+      }
+
+      // mismo día
+      const today = new Date();
+
+      if (
+        startOfDay(
+          sale.createdAt
+        ).getTime()
+        !==
+        startOfDay(
+          today
+        ).getTime()
+      ) {
+        throw new Error(
+          'Solo puede anularse el mismo día'
+        );
+      }
+
+      ////////////////////////////////////
+      // CUSTOMER MEMBERSHIP
+      ////////////////////////////////////
+
+      const membership =
+        await tx.customerMembership
+        .findUnique({
+
+        where: {
+          customerId:
+            sale.partnerId
+        }
+
+      });
+
+      if (!membership)
+        throw new Error(
+          'Membresía no encontrada'
+        );
+
+      const newEndDate =
+        endOfDay(
+          addDays(
+            membership.endDate,
+            -sale.plan.durationDays
+          )
+        );
+
+      ////////////////////////////////////
+      // ANULAR VENTA
+      ////////////////////////////////////
+
+      await tx.membershipSale.update({
+
+        where: {
+          id: sale.id
+        },
+
+        data: {
+          status:
+            'ANNULLED'
+        }
+
+      });
+
+      ////////////////////////////////////
+      // SIN MEMBRESÍA
+      ////////////////////////////////////
+
+      if (
+        newEndDate <= today
+      ) {
+
+        await tx.customerMembership
+        .update({
+
+          where: {
+            customerId:
+              sale.partnerId
+          },
+
+          data: {
+            endDate:
+              today,
+
+            deletedFromDevice:
+              true
+          }
+
+        });
+
+        await tx.command.create({
+
+          data: {
+
+            type:
+              'DELETE_FACE',
+
+            payload: {
+              userId:
+                sale.partnerId
+            },
+
+            membershipSaleId:
+              sale.id,
+
+            companyId,
+            branchId
+          }
+
+        });
+
+      }
+
+      ////////////////////////////////////
+      // AÚN TIENE VIGENCIA
+      ////////////////////////////////////
+
+      else {
+
+        await tx.customerMembership
+        .update({
+
+          where: {
+            customerId:
+              sale.partnerId
+          },
+
+          data: {
+            endDate:
+              newEndDate
+          }
+
+        });
+
+        await tx.command.create({
+
+          data: {
+
+            type:
+            'SYNC_USER_FULL',
+
+            payload: {
+
+              userId:
+                sale.partnerId,
+
+              name:
+                sale.partner.name,
+
+              startDate:
+                membership.startDate
+                .toISOString(),
+
+              endDate:
+                newEndDate
+                .toISOString(),
+
+              imagePath:
+                sale.partner
+                .imageUrl
+            },
+
+            membershipSaleId:
+              sale.id,
+
+            companyId,
+            branchId
+
+          }
+
+        });
+
+      }
+
+      return true;
+
+    }
+  );
+
+};

@@ -186,3 +186,34 @@ export const assignMembership = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+//=========================
+// ANULAR MEMBERSHIP (SOFT DELETE)
+//=========================
+export const annulMembershipSale = async (
+   req,
+   res
+) => {
+
+   try {
+
+      const saleId = req.params.id;
+
+      const result =
+         await annulMembershipSaleService({
+            saleId,
+            userId: req.user.id,
+            companyId: req.user.companyId,
+            branchId: req.user.branchId
+         });
+
+      res.json(result);
+
+   } catch (error) {
+
+      res.status(400).json({
+         message: error.message
+      });
+
+   }
+
+};

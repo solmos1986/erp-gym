@@ -9,7 +9,8 @@ import {
   retryMembershipSale,
   getMembershipReportPDF, 
   syncMembershipStatus,
-  assignMembership 
+  assignMembership,
+  annulMembershipSale 
 } from "./membership.controller.js";
 
 import { requireAuth } from "../../middlewares/auth.middleware.js";
@@ -103,8 +104,13 @@ router.post(
 );
 
 //=========================
-// CREATE CUSTOMER MEMBERSHIP STATUS
+// DELETE MEMBERSHIP (SOFT DELETE)
 //=========================
-
+router.post(
+   '/:id/annul',
+   requireAuth,
+   requirePermission("TENANT_MEMBERSHIP_DELETE"),
+   annulMembershipSale
+);
 
 export default router;
