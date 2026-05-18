@@ -231,6 +231,7 @@ export const getAll = async (req) => {
   const now = new Date();
 
   if (status === 'ACTIVE') {
+     where.status = 'ACTIVE';
     where.startDate = { lte: now };
     where.endDate = { gte: now };
   }
