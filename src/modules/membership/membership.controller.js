@@ -199,7 +199,7 @@ export const annulMembershipSale = async (
       const saleId = req.params.id;
 
       const result =
-         await annulMembershipSale({
+         await membershipService.annulMembershipSale({
             saleId,
             userId: req.user.id,
             companyId: req.user.companyId,
