@@ -294,7 +294,7 @@ enum PartnerType {
 enum MembershipStatus {
   ACTIVE
   EXPIRED
-  ANULLED
+  ANNULLED
 }
 
 enum DeviceType {
