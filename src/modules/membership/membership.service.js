@@ -236,12 +236,21 @@ export const getAll = async (req) => {
   }
 
   if (status === 'EXPIRED') {
-    where.endDate = { lt: now };
-  }
 
-  if (status === 'FUTURE') {
-    where.startDate = { gt: now };
-  }
+   where.status = 'ACTIVE';
+
+   where.endDate = {
+      lt: now
+   };
+
+}
+
+  if (status === 'ANNULLED') {
+
+   where.status =
+      'ANNULLED';
+
+}
 
   return await prisma.membershipSale.findMany({
     where,
