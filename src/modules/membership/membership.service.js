@@ -232,8 +232,6 @@ export const getAll = async (req) => {
 
   if (status === 'ACTIVE') {
      where.status = 'ACTIVE';
-    where.startDate = { lte: now };
-    where.endDate = { gte: now };
   }
 
   if (status === 'EXPIRED') {
