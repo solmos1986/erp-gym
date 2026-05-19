@@ -17,19 +17,27 @@ export function initWebSocket(server) {
         // 🤖 AGENT (lo tuyo, intacto)
         // ==========================
         if (data.type === "REGISTER") {
-          const { agentKey, companyId, branchId } = data;
 
-          ws.clientType = "AGENT";
-          ws.agentKey = agentKey;
+            const {
+              agentKey,
+              companyId,
+              branchId
+            } = data;
 
-          clients.set(agentKey, {
-            ws,
-            companyId,
-            branchId,
-          });
+            console.log(
+              "REGISTER RECIBIDO:",
+              agentKey,
+              companyId,
+              branchId
+            );
 
-          console.log(`✅ Agent registrado: ${agentKey}`);
-        }
+            clients.set(agentKey,{
+              ws,
+              companyId,
+              branchId
+            });
+
+          }
 
         // ==========================
         // 🖥️ FRONTEND (nuevo)
