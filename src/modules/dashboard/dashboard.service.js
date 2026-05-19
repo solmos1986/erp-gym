@@ -8,21 +8,43 @@ export const getDashboardSummary = async ({
   branchId
 }) => {
 
-  const today = new Date();
-
   //////////////////////////////////////
-  // 📅 START DAY
-  //////////////////////////////////////
-  const startOfDay = new Date(today);
+// 🇧🇴 BOLIVIA TIME
+//////////////////////////////////////
+const boliviaNow = new Date(
+  new Date().toLocaleString(
+    "en-US",
+    {
+      timeZone: "America/La_Paz"
+    }
+  )
+);
 
-  startOfDay.setHours(0, 0, 0, 0);
+const today = boliviaNow;
 
-  //////////////////////////////////////
-  // 📅 END DAY
-  //////////////////////////////////////
-  const endOfDay = new Date(today);
+//////////////////////////////////////
+// START DAY
+//////////////////////////////////////
+const startOfDay = new Date(today);
 
-  endOfDay.setHours(23, 59, 59, 999);
+startOfDay.setHours(
+  0,
+  0,
+  0,
+  0
+);
+
+//////////////////////////////////////
+// END DAY
+//////////////////////////////////////
+const endOfDay = new Date(today);
+
+endOfDay.setHours(
+  23,
+  59,
+  59,
+  999
+);
 
   //////////////////////////////////////
   // 📅 START WEEK
