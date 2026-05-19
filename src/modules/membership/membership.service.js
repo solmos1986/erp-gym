@@ -392,8 +392,10 @@ export const syncMembershipStatus = async ({ customerId, companyId }) => {
   });
 });
 
-sendCommandToAgent(companyId, membership.branchId, {
-  type: 'SYNC'
+sendCommandToAgent({
+  companyId,
+  branchId: membership.branchId,
+  payload: 'SYNC'
 });
 notifyFrontend({
   type: "MEMBERSHIP_UPDATE"
