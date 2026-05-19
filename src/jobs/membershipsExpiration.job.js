@@ -7,7 +7,7 @@ export function startMembershipExpirationJob() {
 
 cron.schedule('34 2 * * *', async () => {
   
-  .
+  try {
     const now = new Date();
 
     await prisma.$transaction(async (tx) => {
