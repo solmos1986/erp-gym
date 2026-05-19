@@ -5,7 +5,7 @@ import { sendCommandToAgent } from '../lib/websocket.server.js';
 export function startMembershipExpirationJob() {
   
 
-cron.schedule('34 2 * * *', async () => {
+cron.schedule('5 4 * * *', async () => {
   
   try {
     const now = new Date();
