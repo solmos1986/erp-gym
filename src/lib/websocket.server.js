@@ -67,19 +67,47 @@ export function initWebSocket(server) {
 // ==========================
 // 🤖 AGENT (lo tuyo intacto)
 // ==========================
-export function sendCommandToAgent({ companyId, branchId, payload }) {
+export function sendCommandToAgent({
+  companyId,
+  branchId,
+  payload
+}) {
+
+  console.log(
+    "🔍 BUSCANDO:",
+    companyId,
+    branchId
+  );
+
   for (const client of clients.values()) {
+
+    console.log(
+      "🤖 AGENT REGISTRADO:",
+      client.companyId,
+      client.branchId
+    );
+
     if (
       client.companyId === companyId &&
       client.branchId === branchId
     ) {
+
+      console.log(
+        "✅ ENVIANDO SYNC A:",
+        client.companyId,
+        client.branchId
+      );
+
       client.ws.send(
         JSON.stringify({
           type: "SYNC"
         })
       );
+
     }
+
   }
+
 }
 
 // ==========================
