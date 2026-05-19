@@ -320,3 +320,227 @@ export const getSalesLast7Days = async ({
     })
   );
 };
+//////////////////////////////////////
+// 💰 REVENUE COMPARISON
+//////////////////////////////////////
+export const
+getRevenueComparison =
+async ({
+  companyId,
+  branchId
+}) => {
+
+  const now = new Date();
+
+  const currentMonth =
+    now.getMonth();
+
+  const currentYear =
+    now.getFullYear();
+
+  const currentStart =
+    new Date(
+      currentYear,
+      currentMonth,
+      1
+    );
+
+  const previousStart =
+    new Date(
+      currentYear,
+      currentMonth - 1,
+      1
+    );
+
+  const previousEnd =
+    new Date(
+      currentYear,
+      currentMonth,
+      0
+    );
+
+  const sales =
+    await prisma.membershipSale
+    .findMany({
+
+      where: {
+        companyId,
+        branchId,
+
+        saleDate: {
+          gte:
+            previousStart
+        }
+      },
+
+      select: {
+        saleDate: true,
+        price: true
+      }
+    });
+
+  const current =
+    {};
+
+  const previous =
+    {};
+
+  sales.forEach(
+    sale => {
+
+      const day =
+        sale.saleDate
+        .getDate();
+
+      const amount =
+        Number(
+          sale.price
+        );
+
+      if (
+        sale.saleDate >=
+        currentStart
+      ) {
+
+        current[day] =
+          (
+            current[day] ||
+            0
+          ) + amount;
+
+      } else if (
+
+        sale.saleDate >=
+        previousStart &&
+
+        sale.saleDate <=
+        previousEnd
+
+      ) {
+
+        previous[day] =
+          (
+            previous[day] ||
+            0
+          ) + amount;
+      }
+
+    });
+
+  const labels =
+    Array.from(
+      {
+        length: 31
+      },
+
+      (_, i) =>
+        i + 1
+    );
+
+  return {
+
+    labels,
+
+    currentMonth:
+      labels.map(
+        d =>
+          current[d] ||
+          0
+      ),
+
+    previousMonth:
+      labels.map(
+        d =>
+          previous[d] ||
+          0
+      )
+  };
+
+};
+
+//////////////////////////////////////
+// 📅 REGISTRATIONS
+//////////////////////////////////////
+export const
+getRegistrationsComparison =
+async ({
+  companyId,
+  branchId
+}) => {
+
+  const revenue =
+    await
+    getRevenueComparison({
+      companyId,
+      branchId
+    });
+
+  return revenue;
+};
+
+//////////////////////////////////////
+// 🍩 PLAN DISTRIBUTION
+//////////////////////////////////////
+export const
+getPlanDistribution =
+async ({
+  companyId,
+  branchId
+}) => {
+
+  const plans =
+    await prisma
+    .membershipSale
+    .groupBy({
+
+      by:
+        ["planId"],
+
+      _count: true,
+
+      where: {
+        companyId,
+        branchId
+      }
+
+    });
+
+  const planIds =
+    plans.map(
+      p =>
+        p.planId
+    );
+
+  const planData =
+    await prisma.plan
+    .findMany({
+
+      where: {
+        id: {
+          in:
+          planIds
+        }
+      }
+
+    });
+
+  return plans.map(
+    p => ({
+
+      name:
+
+      planData.find(
+        x =>
+          x.id ===
+          p.planId
+      )?.name ||
+
+      "Unknown",
+
+      value:
+        p._count
+
+    })
+  );
+
+};
