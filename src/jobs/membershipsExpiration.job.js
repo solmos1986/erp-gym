@@ -6,7 +6,7 @@ export function startMembershipExpirationJob() {
   
 
 cron.schedule('5 4 * * *', async () => {
-  
+  console.log('Running memberships expiration job at', new Date().toISOString());
   try {
     const now = new Date();
 
