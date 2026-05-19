@@ -5,7 +5,7 @@ import { sendCommandToAgent } from '../lib/websocket.server.js';
 export function startMembershipExpirationJob() {
   
 
-cron.schedule('5 4 * * *', async () => {
+cron.schedule('8 2 * * *', async () => {
   console.log('Running memberships expiration job at', new Date().toISOString());
   try {
     const now = new Date();
@@ -74,16 +74,12 @@ cron.schedule('5 4 * * *', async () => {
         })),
       });
 
-       const notify='SYNC';
-    // Enviar notificacion al WebSocket para sincronizar la cara del cliente
-    sendCommandToAgent(companyId, branchId, {
-    type: 'SYNC'
-  });
+      
 
       
       
       
-    });
+  });
 
   } catch (error) {
     
