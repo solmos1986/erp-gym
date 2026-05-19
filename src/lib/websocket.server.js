@@ -93,14 +93,13 @@ export function sendCommandToAgent({
     ) {
 
       console.log(
-        "✅ ENVIANDO SYNC A:",
-        client.companyId,
-        client.branchId
+        "✅ ENVIANDO:",
+        payload
       );
 
       client.ws.send(
         JSON.stringify({
-          type: "SYNC"
+          type: payload
         })
       );
 
