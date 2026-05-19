@@ -7,44 +7,56 @@ export const getDashboardSummary = async ({
   companyId,
   branchId
 }) => {
-
-  //////////////////////////////////////
-// 🇧🇴 BOLIVIA TIME
 //////////////////////////////////////
-const boliviaNow = new Date(
-  new Date().toLocaleString(
-    "en-US",
-    {
-      timeZone: "America/La_Paz"
-    }
-  )
-);
+// 🇧🇴 BOLIVIA UTC OFFSET (-4)
+//////////////////////////////////////
+
+const now = new Date();
+
+const boliviaOffsetMs =
+  4 * 60 * 60 * 1000;
+
+const boliviaNow =
+  new Date(
+    now.getTime() -
+    boliviaOffsetMs
+  );
 
 const today = boliviaNow;
 
 //////////////////////////////////////
-// START DAY
+// START DAY BOLIVIA
 //////////////////////////////////////
-const startOfDay = new Date(today);
 
-startOfDay.setHours(
-  0,
+const startOfDay =
+  new Date(today);
+
+startOfDay.setUTCHours(
+  4,
   0,
   0,
   0
 );
 
 //////////////////////////////////////
-// END DAY
+// END DAY BOLIVIA
 //////////////////////////////////////
-const endOfDay = new Date(today);
 
-endOfDay.setHours(
-  23,
+const endOfDay =
+  new Date(today);
+
+endOfDay.setUTCHours(
+  27,
   59,
   59,
   999
 );
+
+console.log({
+  startOfDay,
+  endOfDay
+});
+
 
   //////////////////////////////////////
   // 📅 START WEEK
