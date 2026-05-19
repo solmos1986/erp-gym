@@ -7,7 +7,7 @@ export function initWebSocket(server) {
   const wss = new WebSocketServer({ server });
 
   wss.on("connection", (ws) => {
-    console.log("🔌 Nueva conexión WS");
+    
 
     ws.on("message", (message) => {
       try {
@@ -24,12 +24,7 @@ export function initWebSocket(server) {
               branchId
             } = data;
 
-            console.log(
-              "REGISTER RECIBIDO:",
-              agentKey,
-              companyId,
-              branchId
-            );
+            
 
             clients.set(agentKey,{
               ws,
@@ -46,7 +41,7 @@ export function initWebSocket(server) {
           ws.clientType = "FRONTEND";
           frontends.add(ws);
 
-          console.log("🖥️ Frontend conectado");
+      
         }
 
       } catch (err) {
@@ -59,14 +54,14 @@ export function initWebSocket(server) {
       for (const [key, client] of clients.entries()) {
         if (client.ws === ws) {
           clients.delete(key);
-          console.log(`❌ Agent desconectado: ${key}`);
+         
         }
       }
 
       // limpiar frontends
       if (frontends.has(ws)) {
         frontends.delete(ws);
-        console.log("❌ Frontend desconectado");
+       
       }
     });
   });
@@ -81,29 +76,18 @@ export function sendCommandToAgent({
   payload
 }) {
 
-  console.log(
-    "🔍 BUSCANDO:",
-    companyId,
-    branchId
-  );
+  
 
   for (const client of clients.values()) {
 
-    console.log(
-      "🤖 AGENT REGISTRADO:",
-      client.companyId,
-      client.branchId
-    );
+   
 
     if (
       client.companyId === companyId &&
       client.branchId === branchId
     ) {
 
-      console.log(
-        "✅ ENVIANDO:",
-        payload
-      );
+    
 
       client.ws.send(
         JSON.stringify({

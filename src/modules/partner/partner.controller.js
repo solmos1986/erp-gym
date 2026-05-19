@@ -315,7 +315,7 @@ export const updatePartner = async (req, res) => {
 // =========================
 export const deletePartner = async (req, res) => {
   const { id } = req.params;
-  console.log("Intentando desactivar cliente req.user.branchId:", req.user.branchId); // 🔥 LOG DE DEPURACIÓN
+  
   try {
     const partner = await prisma.partner.findFirst({
       where: {
@@ -323,7 +323,6 @@ export const deletePartner = async (req, res) => {
         ...applyTenantFilter(req)
       }
     });
-    console.log("Cliente encontrado:", partner); // 🔥 LOG DE DEPURACIÓN
 
     if (!partner) {
       return res.status(404).json({

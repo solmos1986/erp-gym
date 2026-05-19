@@ -139,7 +139,6 @@ export const getMembershipReportPDF = async (req, res) => {
 
       status: req.query.status || 'TODOS'
     };
-    console.log('Query de PDF', req.query);
     return generateMembershipReport(res, data, filters);
 
   } catch (error) {

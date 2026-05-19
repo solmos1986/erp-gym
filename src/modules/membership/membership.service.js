@@ -54,14 +54,7 @@ export const purchase = async ({
     let startDate;
     let endDate;
     let startDateMembershipSale;
-    console.log('Valores originales:', {
-  startDate,
-  endDate
-});
-console.log('Tipos:', {
-  startDate: typeof startDate,
-  endDate: typeof endDate
-});
+   
     // 🔍 membresía actual
     const current = await tx.customerMembership.findUnique({
       where: { customerId: partnerId }
@@ -76,8 +69,7 @@ console.log('Tipos:', {
       endDate = endOfDay(addDays(startDate, plan.durationDays));
       startDateMembershipSale = startOfDay(startDate);
     }
-    console.log("Fechas calculadas:", { startDate, endDate, startDateMembershipSale });
-
+   
     // 🧱 upsert membresía
     const membership = await tx.customerMembership.upsert({
       where: { customerId: partnerId },
@@ -250,7 +242,7 @@ export const getAll = async (req) => {
       'ANNULLED';
 
 }
-console.log('Where clause:', where);
+
   return await prisma.membershipSale.findMany({
     where,
     include: {
@@ -526,7 +518,6 @@ export const assignMembership = async ({
   if (normalizedStartDate > normalizedEndDate) {
     throw new Error('INVALID_DATES');
   }
-console.log('Fechas normalizadas:', { normalizedStartDate, normalizedEndDate });
   // validar cliente
   const customer = await prisma.partner.findFirst({
     where: {

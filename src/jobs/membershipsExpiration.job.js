@@ -7,8 +7,7 @@ export function startMembershipExpirationJob() {
 
 cron.schedule('34 2 * * *', async () => {
   
-  console.log('Ejecutando JOBBBB de expiración de membresías:', new Date());
-  try {
+  .
     const now = new Date();
 
     await prisma.$transaction(async (tx) => {
@@ -29,8 +28,7 @@ cron.schedule('34 2 * * *', async () => {
           branchId: true
         },
       });
-      console.log('Memberships a expirar:', customerMembershipsToExpire.length);
-      console.log(customerMembershipsToExpire);
+      
       if (customerMembershipsToExpire.length === 0) {
         
         return;
@@ -48,7 +46,7 @@ cron.schedule('34 2 * * *', async () => {
           status: 'EXPIRED',
         },
       });
-            console.log('Sales expiradas:', expiredSales);
+            
 
       // 🔥 3. Expirar CustomerMembership
       const expiredCustomerMemberships = await tx.customerMembership.updateMany({
@@ -62,7 +60,7 @@ cron.schedule('34 2 * * *', async () => {
           //expiredCommandSent: true,
         },
       });
-      console.log('CustomerMemberships expiradas:', expiredCustomerMemberships);
+      
       // 🔥 4. Crear commands
       await tx.command.createMany({
         data: customerMembershipsToExpire.map(m => ({

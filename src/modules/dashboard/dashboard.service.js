@@ -52,10 +52,7 @@ endOfDay.setUTCHours(
   999
 );
 
-console.log({
-  startOfDay,
-  endOfDay
-});
+
 
 
   //////////////////////////////////////
